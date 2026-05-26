@@ -43,7 +43,7 @@ Pasos para tener el proyecto corriendo por primera vez.
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/TU_USUARIO/interview-prep-app.git
+git clone https://github.com/albertsp/interview-prep-app.git
 cd interview-prep-app
 ```
 
