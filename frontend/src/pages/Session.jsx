@@ -1,7 +1,11 @@
+import StackSelector from "../components/StackSelector"
 
 function Session(){
     return(
-        <h1>Session</h1>
+        <>
+            <StackSelector onSubmit={(select)=>console.log(select)}></StackSelector>
+        </>
+        
     )
 }
 
