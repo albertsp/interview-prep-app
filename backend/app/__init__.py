@@ -4,9 +4,12 @@ from .config import Config
 from flask_cors import CORS
 from flask_migrate import Migrate
 from .routes.main import main
+from flask_jwt_extended import JWTManager
 
-# Creamos la clase SQLAlchemy para integrar con Flask
+
+# Creamos la clase SQLAlchemy y JWTManager para integrar con Flask
 db = SQLAlchemy()
+jwt = JWTManager()
 
 # Funcion para crear la app
 def create_app():
@@ -14,12 +17,13 @@ def create_app():
     app.config.from_object(Config)      # Pasamos parametros de configuracion
 
     db.init_app(app)                    # Inicializamos app Flask con la extension SQLAlchemy
-
+    jwt.init_app(app)                   # Inicializamos app Flask con extension JTManager
     from .models.user import User
     from .routes.auth import auth
 
     Migrate(app, db)                    # Habilita migraciones de base de datos con Flask
     CORS(app)                           # Permite peticiones desde origenes distintos
+
 
     app.register_blueprint(main)
     app.register_blueprint(auth)
