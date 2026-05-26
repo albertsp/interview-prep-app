@@ -70,13 +70,10 @@ cp .env.example .env
 
 ### 3. Base de datos (Docker)
 
+Si el contenedor no existe lo crea
+
 ```bash
-docker run --name interview-prep-db \
-  -e POSTGRES_USER=admin \
-  -e POSTGRES_PASSWORD=admin \
-  -e POSTGRES_DB=interview_prep \
-  -p 5432:5432 \
-  -d postgres:16
+docker compose up -d
 ```
 
 ### 4. Migraciones
@@ -107,7 +104,7 @@ Comandos del día a día una vez tienes el setup hecho.
 ### Arrancar la base de datos
 
 ```bash
-docker start interview-prep-db
+docker compose up -d
 ```
 
 ### Arrancar el backend
@@ -132,7 +129,7 @@ npm run dev
 ### Parar la base de datos
 
 ```bash
-docker stop interview-prep-db
+docker compose down
 ```
 
 ---
