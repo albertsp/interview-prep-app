@@ -16,11 +16,13 @@ def create_app():
     db.init_app(app)                    # Inicializamos app Flask con la extension SQLAlchemy
 
     from .models.user import User
-
+    from .routes.auth import auth
 
     Migrate(app, db)                    # Habilita migraciones de base de datos con Flask
     CORS(app)                           # Permite peticiones desde origenes distintos
 
     app.register_blueprint(main)
+    app.register_blueprint(auth)
+
     return app
 
