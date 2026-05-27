@@ -5,6 +5,7 @@ import Home  from "./pages/Home";
 import Session from "./pages/Session"
 import Dashboard from "./pages/Dashboard"
 import Layout from "./components/Layout"
+import ProtectedRoute from "./components/ProtectedRoute";
 
 
 function App() {
@@ -15,8 +16,11 @@ function App() {
     <Routes>
       <Route element={<Layout/>}>
         <Route path="/" element={<Home/>} />
-        <Route path="/session" element={<Session/>} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route element={<ProtectedRoute/>}>
+          <Route path="/session" element={<Session/>} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+
       </Route>
 
     </Routes>
