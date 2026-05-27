@@ -2,11 +2,17 @@
 
 > Aplicación para reforzar el estudio de entrevistas técnicas de desarrollo web.
 
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
+[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=white)](https://react.dev)
+[![Flask](https://img.shields.io/badge/Flask-3-000000?style=flat&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat&logo=postgresql&logoColor=white)](https://postgresql.org)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=flat)](LICENSE)
+
 ---
 
 ## Descripción
 
-<!-- TODO: Explicar qué hace la app, qué problema resuelve y para quién -->
+Interview Prep App es una plataforma interactiva para que desarrolladores web practiquen entrevistas técnicas. Permite seleccionar tu rol (Frontend/Backend), tecnologías y nivel de dificultad, y genera preguntas personalizadas vía IA para simular entrevistas reales.
 
 ## Stack
 
@@ -14,7 +20,7 @@
 | -------------------- | -------------------------- |
 | Frontend             | React + Vite               |
 | Routing              | React Router               |
-| Estilos              | Tailwind CSS + Shadcn/ui   |
+| Estilos              | Tailwind CSS + Shadcn/ui (planificado) |
 | Backend              | Flask (Python)             |
 | ORM                  | SQLAlchemy + Flask-Migrate |
 | Auth                 | JWT + bcrypt               |
@@ -22,6 +28,13 @@
 | Base de datos (dev)  | PostgreSQL (Docker)        |
 | Base de datos (prod) | PostgreSQL (Render)        |
 | Deploy               | Render                     |
+
+---
+
+## Capturas
+
+> ![App screenshot](docs/screenshot.png)
+> *Próximamente — captura de la aplicación en funcionamiento.*
 
 ---
 
@@ -111,7 +124,12 @@ docker compose up -d
 
 ```bash
 cd backend
-source venv/bin/activate  # Mac/Linux
+
+# Mac/Linux:
+source venv/bin/activate
+# Windows:
+venv\Scripts\activate
+
 flask run
 ```
 
@@ -131,6 +149,59 @@ npm run dev
 ```bash
 docker compose down
 ```
+
+---
+
+## Estructura del proyecto
+
+```
+interview-prep-app/
+├── backend/
+│   ├── app/
+│   │   ├── models/       # Modelos de base de datos (User)
+│   │   ├── routes/       # Endpoints de la API (auth, main)
+│   │   ├── services/     # Lógica de negocio (IA, etc.)
+│   │   ├── __init__.py   # Fábrica de la app Flask
+│   │   └── config.py     # Configuración desde .env
+│   ├── migrations/       # Migraciones de SQLAlchemy
+│   ├── requirements.txt
+│   └── run.py            # Punto de entrada
+├── frontend/
+│   ├── src/
+│   │   ├── components/   # Componentes reutilizables
+│   │   ├── context/      # Contextos de React (AuthContext)
+│   │   ├── data/         # Datos estáticos (stacks)
+│   │   ├── pages/        # Páginas (Home, Session, Dashboard)
+│   │   ├── services/     # Llamadas a la API
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+├── docker-compose.yml    # PostgreSQL local
+└── README.md
+```
+
+---
+
+## Scripts útiles
+
+| Comando | Descripción |
+|---------|-------------|
+| `docker compose up -d` | Iniciar PostgreSQL |
+| `docker compose down` | Detener PostgreSQL |
+| `cd backend && flask run` | Iniciar backend |
+| `cd frontend && npm run dev` | Iniciar frontend |
+| `cd frontend && npm run build` | Build producción frontend |
+| `cd frontend && npm run lint` | Lint frontend |
+| `cd backend && flask db migrate` | Crear migración |
+| `cd backend && flask db upgrade` | Aplicar migraciones |
+
+---
+
+## Licencia
+
+Distribuido bajo licencia MIT. Ver [LICENSE](LICENSE) para más información.
 
 ---
 
