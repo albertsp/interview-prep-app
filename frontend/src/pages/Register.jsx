@@ -16,8 +16,7 @@ function Register(){
 
     async function handleSubmit(e){
         e.preventDefault()
-        const result = await fetchRegister(email,password)
-
+        await fetchRegister(email,password)
         // Añadir condicion register exitoso
         navigate("/login")
         
