@@ -1,8 +1,9 @@
-
+import { Button } from "#components/ui/button.jsx"
 
 function Home(){
     return(
-        <h1>Home</h1>
+        
+        <Button>Home</Button>
     )
 }
 
