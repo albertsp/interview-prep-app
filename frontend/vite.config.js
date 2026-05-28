@@ -9,12 +9,12 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(),tailwind()],
+  plugins: [react(), tailwind()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src")
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 })
+
