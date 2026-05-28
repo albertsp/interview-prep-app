@@ -37,6 +37,7 @@ def login():
     if data.get("email") is None or data.get("password") is None:
         return jsonify({"error": "Los campos no pueden estar vacios"}), 400
 
+    # Query para obtener el user de BD como objeto con atributos
     user = User.query.filter_by(email=data.get("email")).first()
 
     # Buscamos user en BD
@@ -46,9 +47,10 @@ def login():
     # Password del request encoded
     encodedPassword = data.get("password").encode('utf-8')
 
-    #
+    # Comprobamos que coincidan los hashes
     if bcrypt.checkpw(encodedPassword, user.password.encode('utf-8')) is False:
         return jsonify({"error": "Credenciales incorrectas"}), 400
     
+    # Creamos un acces token
     access_token = create_access_token(identity=user.user_id)
-    return jsonify(access_token=access_token), 200
+    return jsonify(access_token=access_token, user_id =user.user_id, name = user.name), 200
