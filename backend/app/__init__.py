@@ -20,6 +20,7 @@ def create_app():
     jwt.init_app(app)                   # Inicializamos app Flask con extension JTManager
     from .models.user import User
     from .routes.auth import auth
+    from .routes.stacks import stacks
 
     Migrate(app, db)                    # Habilita migraciones de base de datos con Flask
     CORS(app)                           # Permite peticiones desde origenes distintos
@@ -27,6 +28,7 @@ def create_app():
 
     app.register_blueprint(main)
     app.register_blueprint(auth)
+    app.register_blueprint(stacks)
 
     return app
 
