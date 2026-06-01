@@ -6,14 +6,18 @@ const AuthContext = createContext()
 
 export function AuthProvider({children}){
 
-    const [user, setUser] = useState("")
-    const [token, setToken] = useState("")
+    const [user, setUser] = useState(localStorage.getItem("user") || "")
+    const [token, setToken] = useState(localStorage.getItem("token") || "")
 
     function login(logUser,logToken){
+        localStorage.setItem("token", logToken)
+        localStorage.setItem("user", logUser)
         setToken(logToken)
         setUser(logUser)
     }
     function logout(){
+        localStorage.removeItem("token")
+        localStorage.removeItem("user")
         setToken("")
         setUser("")
     }
