@@ -1,4 +1,6 @@
-import { useNavigate } from "react-router-dom"
+"use client"
+
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -13,7 +15,7 @@ import { useAuth } from "@/context/AuthContext"
 
 function Navbar() {
   const { token, user, logout } = useAuth()
-  const navigate = useNavigate()
+  const router = useRouter()
   const initials = user ? user.charAt(0).toUpperCase() : "U"
 
   return (
@@ -42,12 +44,12 @@ function Navbar() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                <DropdownMenuItem onClick={() => router.push("/dashboard")}>
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => { logout(); navigate("/") }}>
+                <DropdownMenuItem onClick={() => { logout(); router.push("/") }}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Cerrar sesión
                 </DropdownMenuItem>
@@ -55,12 +57,12 @@ function Navbar() {
             </DropdownMenu>
           ) : (
             <>
-              <Button variant="ghost" onClick={() => navigate("/login")}>
+              <Button variant="ghost" onClick={() => router.push("/login")}>
                 Login
               </Button>
               <Button
                 className="bg-sky-500 hover:bg-sky-400 text-white"
-                onClick={() => navigate("/register")}
+                onClick={() => router.push("/register")}
               >
                 Register
               </Button>
