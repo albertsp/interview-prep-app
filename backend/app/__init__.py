@@ -21,6 +21,7 @@ def create_app():
 
     from .models.user import User
     from .models.session import Session
+    from .models.question import Question
     from .routes.auth import auth
     from .routes.stacks import stacks
 
