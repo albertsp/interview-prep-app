@@ -18,7 +18,9 @@ def create_app():
 
     db.init_app(app)                    # Inicializamos app Flask con la extension SQLAlchemy
     jwt.init_app(app)                   # Inicializamos app Flask con extension JTManager
+
     from .models.user import User
+    from .models.session import Session
     from .routes.auth import auth
     from .routes.stacks import stacks
 
