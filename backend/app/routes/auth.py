@@ -52,5 +52,5 @@ def login():
         return jsonify({"error": "Credenciales incorrectas"}), 400
     
     # Creamos un acces token
-    access_token = create_access_token(identity=user.user_id)
+    access_token = create_access_token(identity=str(user.user_id))
     return jsonify(access_token=access_token, user_id =user.user_id, name = user.name), 200
