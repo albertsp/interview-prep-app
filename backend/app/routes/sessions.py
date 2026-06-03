@@ -40,12 +40,16 @@ def create_session():
     
     db.session.commit()
     
-    
     # Devolvemos la sesion con las preguntas
-
     return jsonify({
                     "session_id": new_session.session_id,
                     "stack": new_session.stack,
                     "level": new_session.level,
                     "questions": questions
                     }), 201
+
+
+@sessions.route('/<int:session_id>/questions/<int:question_id>', methods=['PATCH'])
+def answer_question(session_id, question_id):
+    
+    return jsonify()
