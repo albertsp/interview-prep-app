@@ -4,7 +4,7 @@ from ..constants.stacks import VALID_LEVELS,VALID_STACKS
 from ..models.session import Session
 from ..models.question import Question
 from .. import db
-from ..services.ai_service import generate_questions
+from ..services.ai_service import generate_questions, generate_feedback
 
 sessions = Blueprint('sessions',__name__,url_prefix='/sessions')
 
@@ -50,6 +50,41 @@ def create_session():
 
 
 @sessions.route('/<int:session_id>/questions/<int:question_id>', methods=['PATCH'])
+# Protegemos el endpoint con JWT
+@jwt_required() 
 def answer_question(session_id, question_id):
-    
-    return jsonify()
+    # Extraemos user_id del token
+    user_id = get_jwt_identity() 
+
+    # Guardamos el body de la peticion
+    data = request.get_json()
+
+    # Buscamos en BD la sesión del usuario
+    user_sesion = Session.query.filter_by(session_id=session_id, user_id=user_id).first()
+
+    # Si no existe devolvemos error
+    if user_sesion is None:
+        return jsonify({"msg": "La sesión no existe"}),404
+
+    # Buscamos la pregunta por id
+    user_question = Question.query.filter_by(question_id=question_id,session_id=session_id).first()
+
+    # Si no existe devolvemos error
+    if user_question is None:
+        return jsonify({"msg": "La pregunta no existe"}), 404
+
+    # Guardamos la respuesta del usuario en la BD
+    user_question.answer = data.get("answer")
+    db.session.commit()
+
+    # Generamos el feedback de la respuesta y guardamos en BD
+    result = generate_feedback(user_question.question, data.get("answer"))
+    user_question.feedback = result["feedback"]
+    db.session.commit()
+
+    return jsonify({
+                    "session_id": session_id,
+                    "question_id": question_id,
+                    "feedback": user_question.feedback,
+                    "card": result["card"]
+                    }), 200
