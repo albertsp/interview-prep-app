@@ -1,13 +1,20 @@
 "use client"
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext()
 
 export function AuthProvider({children}){
 
-    const [user, setUser] = useState(localStorage.getItem("user") || "")
-    const [token, setToken] = useState(localStorage.getItem("token") || "")
+    const [user, setUser] = useState("")
+    const [token, setToken] = useState("")
+
+    useEffect(() => {
+        const savedUser = localStorage.getItem("user")
+        if (savedUser) setUser(savedUser)
+        const savedToken = localStorage.getItem("token")
+        if (savedToken) setToken(savedToken)
+    }, [])
 
     function login(logUser,logToken){
         localStorage.setItem("token", logToken)

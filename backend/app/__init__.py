@@ -18,15 +18,22 @@ def create_app():
 
     db.init_app(app)                    # Inicializamos app Flask con la extension SQLAlchemy
     jwt.init_app(app)                   # Inicializamos app Flask con extension JTManager
-    from .models.user import User
-    from .routes.auth import auth
 
+    from .models.user import User
+    from .models.session import Session
+    from .models.question import Question
+    from .routes.auth import auth
+    from .routes.stacks import stacks
+    from .routes.sessions import sessions
+    
     Migrate(app, db)                    # Habilita migraciones de base de datos con Flask
     CORS(app)                           # Permite peticiones desde origenes distintos
 
 
     app.register_blueprint(main)
     app.register_blueprint(auth)
+    app.register_blueprint(stacks)
+    app.register_blueprint(sessions)
 
     return app
 
