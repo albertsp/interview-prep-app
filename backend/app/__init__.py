@@ -22,9 +22,11 @@ def create_app():
     from .models.user import User
     from .models.session import Session
     from .models.question import Question
+    from .models.card import Card
     from .routes.auth import auth
     from .routes.stacks import stacks
     from .routes.sessions import sessions
+    from .routes.cards import cards
     
     Migrate(app, db)                    # Habilita migraciones de base de datos con Flask
     CORS(app)                           # Permite peticiones desde origenes distintos
@@ -34,6 +36,7 @@ def create_app():
     app.register_blueprint(auth)
     app.register_blueprint(stacks)
     app.register_blueprint(sessions)
+    app.register_blueprint(cards)
 
     return app
 

@@ -1,5 +1,6 @@
 from groq import Groq
 import json
+import re
 
 SYSTEM_PROMPT_QUESTIONS= """
 You are an expert technical interviewer specializing in software engineering recruitment. Your only task is to generate exactly 5 highly practical and direct technical interview questions.
@@ -17,6 +18,7 @@ STRICT FORMAT AND CONTENT RULES:
 4. REAL LEVELING: Adapt code complexity to the requested level (Basic: obvious bugs, basic logic; Intermediate: concurrency, async, performance; Advanced: clean architecture, extreme optimization, complex edge cases).
 5. CLEAN OUTPUT: Return only the numbered list from 1 to 5 with the questions and their respective code blocks. Do not add introductions, greetings, or additional explanations.
 6. JSON OUTPUT: Return a valid JSON array with exactly 5 strings, one per question. Example format: ["question1", "question2", "question3", "question4", "question5"]. No markdown, no code blocks wrapping the JSON, just the raw JSON array.
+7. CRITICAL: Escape all double quotes inside strings with backslash. Escape all backslashes with double backslash. Do NOT use literal newlines inside JSON strings — use \\n instead.
 """
 
 
@@ -33,8 +35,22 @@ STRICT RULES:
 5. LANGUAGE: Write in Spanish but keep all technical terminology in English (hooks, callback, middleware, closure, etc.).
 6. TONE: Professional and constructive, like a senior developer giving feedback to a junior.
 7. JSON OUTPUT: Return a valid JSON object with this exact structure: {"result": "CORRECT|PARTIALLY_CORRECT|INCORRECT", "feedback": "your feedback here", "card": {"concept": "concept name", "explanation": "brief explanation", "use_case": "practical use case"}}. No markdown, no code blocks, just raw JSON.
+8. CRITICAL: Escape all double quotes inside strings with backslash. Escape all backslashes with double backslash. Do NOT use literal newlines inside JSON strings — use \\n instead.
 """
 client = Groq()
+
+# Limpia y sanitiza la respuesta del modelo antes de parsear JSON
+def _parse_ai_json(raw_content):
+    content = raw_content.strip()
+
+    # Eliminar bloques de markdown ```json ... ``` o ``` ... ```
+    content = re.sub(r"^```(?:json)?\s*", "", content)
+    content = re.sub(r"\s*```$", "", content)
+
+    # strict=False permite caracteres de control (saltos de linea, tabs)
+    # dentro de las strings JSON que el modelo pueda generar sin escapar
+    return json.loads(content, strict=False)
+
 
 def generate_questions(stack,level):
     
@@ -57,7 +73,7 @@ def generate_questions(stack,level):
     # The language model which will generate the completion.
     model="llama-3.3-70b-versatile"
 )
-    return json.loads(chat_completion.choices[0].message.content)
+    return _parse_ai_json(chat_completion.choices[0].message.content)
 
 def generate_feedback(question,answer):
 
@@ -74,7 +90,7 @@ def generate_feedback(question,answer):
         ],
         model="llama-3.3-70b-versatile"
     )
-    return json.loads(chat_completion.choices[0].message.content)
+    return _parse_ai_json(chat_completion.choices[0].message.content)
 
 
 if __name__ == "_main__":
