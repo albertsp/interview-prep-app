@@ -159,7 +159,7 @@ export default function SessionPage() {
               />
             </svg>
           </div>
-          <p className="text-muted-foreground text-lg">Creando sesion...</p>
+          <p className="text-muted-foreground text-xl">Creando sesion...</p>
         </motion.div>
       </div>
     );
@@ -197,15 +197,15 @@ export default function SessionPage() {
   // Modo sesion activa: renderizado condicional segun la fase
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-3xl">
         {/* ---- Indicador de progreso de preguntas ---- */}
         <div className="mb-8">
-          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-3">
-            <span className="font-medium text-foreground">
+          <div className="flex items-center justify-center gap-2 text-base text-muted-foreground mb-4">
+            <span className="font-semibold text-foreground">
               Pregunta {state.currentQuestionIndex + 1}
             </span>
             <span>de</span>
-            <span>{state.questions.length}</span>
+            <span className="font-semibold">{state.questions.length}</span>
           </div>
 
           {/* Dots de progreso al estilo StackSelector */}
@@ -215,21 +215,21 @@ export default function SessionPage() {
                 {idx > 0 && (
                   <div
                     className={cn(
-                      "w-12 h-1 mx-2 rounded-full transition-colors duration-500",
+                      "w-16 h-1 mx-3 rounded-full transition-colors duration-500",
                       idx <= state.currentQuestionIndex ? "bg-primary" : "bg-border"
                     )}
                   />
                 )}
                 <div
                   className={cn(
-                    "flex items-center justify-center size-8 rounded-full text-xs font-bold transition-all duration-300",
+                    "flex items-center justify-center size-10 rounded-full text-sm font-bold transition-all duration-300",
                     idx < state.currentQuestionIndex && "bg-primary text-primary-foreground",
                     idx === state.currentQuestionIndex && "bg-primary text-primary-foreground ring-4 ring-primary/20",
                     idx > state.currentQuestionIndex && "bg-muted text-muted-foreground"
                   )}
                 >
                   {idx < state.currentQuestionIndex ? (
-                    <CheckCircle className="size-4" />
+                    <CheckCircle className="size-5" />
                   ) : (
                     idx + 1
                   )}
@@ -239,7 +239,7 @@ export default function SessionPage() {
           </div>
 
           {/* Stack + level */}
-          <p className="text-center text-xs text-muted-foreground mt-3">
+          <p className="text-center text-sm text-muted-foreground mt-3">
             {state.stack} · {state.level}
           </p>
         </div>
@@ -257,14 +257,14 @@ export default function SessionPage() {
               {/* Card con la pregunta */}
               <Card className="mb-6">
                 <CardContent className="p-8 md:p-10">
-                  <MarkdownContent text={currentQuestion.question} className="text-lg" />
+                  <MarkdownContent text={currentQuestion.question} className="text-xl leading-relaxed" />
                 </CardContent>
               </Card>
 
               {/* Textarea para la respuesta */}
               <textarea
                 className={cn(
-                  "w-full min-h-[150px] rounded-xl border border-input bg-background px-4 py-3 text-sm resize-y transition-colors outline-none",
+                  "w-full min-h-[160px] rounded-xl border border-input bg-background px-5 py-4 text-base resize-y transition-colors outline-none",
                   "placeholder:text-muted-foreground",
                   "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
                   "disabled:pointer-events-none disabled:opacity-50"
@@ -280,13 +280,13 @@ export default function SessionPage() {
                 <motion.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="text-destructive text-sm mt-2"
+                  className="text-destructive text-base mt-3"
                 >
                   {state.error}
                 </motion.p>
               )}
 
-              <div className="mt-4 flex justify-end">
+              <div className="mt-6 flex justify-end">
                 <Button
                   onClick={handleAnswer}
                   disabled={!state.currentAnswer.trim()}
@@ -310,21 +310,29 @@ export default function SessionPage() {
               transition={{ duration: 0.3 }}
               className="text-center py-16"
             >
-              <div className="relative inline-block mb-6">
+              <div className="relative inline-block mb-8">
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                  className="size-16 rounded-full border-4 border-primary/20 border-t-primary"
+                  className="size-20 rounded-full border-4 border-primary/20 border-t-primary"
                 />
-                <Sparkles className="absolute inset-0 m-auto size-6 text-primary" />
+                <Sparkles className="absolute inset-0 m-auto size-7 text-primary" />
               </div>
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
-                className="text-lg text-muted-foreground"
+                className="text-xl text-muted-foreground"
               >
                 La IA esta evaluando tu respuesta...
+              </motion.p>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="text-sm text-muted-foreground/60 mt-2"
+              >
+                Esto puede tardar unos segundos
               </motion.p>
             </motion.div>
           )}
@@ -341,13 +349,13 @@ export default function SessionPage() {
               {/* Card de feedback */}
               <Card className="mb-6">
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Sparkles className="size-5 text-primary" />
-                    Feedback
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pb-6">
-                  <MarkdownContent text={state.feedback} className="text-sm text-muted-foreground" />
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Sparkles className="size-5 text-primary" />
+                      Feedback
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pb-6">
+                    <MarkdownContent text={state.feedback} className="text-base text-muted-foreground" />
                 </CardContent>
               </Card>
 
@@ -360,33 +368,33 @@ export default function SessionPage() {
                 >
                   <Card className="mb-6 border-primary/20 bg-primary/5">
                     <CardHeader className="pb-2">
-                      <CardTitle className="flex items-center gap-2 text-base">
+                      <CardTitle className="flex items-center gap-2 text-lg">
                         <Lightbulb className="size-5 text-primary" />
                         Card de estudio
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4 pb-6">
+                    <CardContent className="space-y-5 pb-6">
                       <div>
-                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                           Concepto
                         </span>
-                        <p className="font-medium mt-1">{state.card.concept}</p>
+                        <p className="text-base font-medium mt-1">{state.card.concept}</p>
                       </div>
 
                       <div>
-                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                           Explicacion
                         </span>
-                        <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                        <p className="text-base text-muted-foreground mt-1 leading-relaxed">
                           {state.card.explanation}
                         </p>
                       </div>
 
                       <div>
-                        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                           Caso de uso
                         </span>
-                        <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                        <p className="text-base text-muted-foreground mt-1 leading-relaxed">
                           {state.card.use_case}
                         </p>
                       </div>
@@ -399,22 +407,24 @@ export default function SessionPage() {
               <div className="flex justify-end gap-2">
                 <Button
                   variant="ghost"
+                  size="lg"
                   onClick={() => dispatch({ type: "EDIT_ANSWER" })}
                   className="gap-2"
                 >
-                  <Pencil className="size-4" />
+                  <Pencil className="size-5" />
                   Editar
                 </Button>
                 <Button
                   variant="outline"
+                  size="lg"
                   onClick={() => dispatch({ type: "CARD_DISCARDED" })}
                   className="gap-2"
                 >
-                  <Trash2 className="size-4" />
+                  <Trash2 className="size-5" />
                   Descartar
                 </Button>
-                <Button onClick={handleSaveCard} className="gap-2">
-                  <Save className="size-4" />
+                <Button onClick={handleSaveCard} size="lg" className="gap-2">
+                  <Save className="size-5" />
                   Guardar card
                 </Button>
               </div>
@@ -440,31 +450,33 @@ export default function SessionPage() {
                     <CheckCircle className="size-10 text-primary" />
                   </motion.div>
 
-                  <h2 className="text-2xl font-bold tracking-tight mb-2">
-                    Sesion completada
-                  </h2>
-                  <p className="text-muted-foreground mb-2">
-                    Has completado las {state.questions.length} preguntas de{" "}
-                    <span className="font-medium text-foreground">{state.stack}</span>.
-                  </p>
-                  <p className="text-sm text-muted-foreground mb-8">
-                    Revisa las cards guardadas en tu dashboard para repasar los conceptos clave.
-                  </p>
+                    <h2 className="text-3xl font-bold tracking-tight mb-2">
+                      Sesion completada
+                    </h2>
+                    <p className="text-base text-muted-foreground mb-2">
+                      Has completado las {state.questions.length} preguntas de{" "}
+                      <span className="font-medium text-foreground">{state.stack}</span>.
+                    </p>
+                    <p className="text-base text-muted-foreground mb-8">
+                      Revisa las cards guardadas en tu dashboard para repasar los conceptos clave.
+                    </p>
 
                   <div className="flex gap-3">
                     <Button
                       variant="outline"
+                      size="lg"
                       onClick={() => router.push("/dashboard")}
                       className="gap-2"
                     >
-                      <Home className="size-4" />
+                      <Home className="size-5" />
                       Ir al dashboard
                     </Button>
                     <Button
+                      size="lg"
                       onClick={() => dispatch({ type: "RESET_SESSION" })}
                       className="gap-2"
                     >
-                      <RotateCcw className="size-4" />
+                      <RotateCcw className="size-5" />
                       Nueva sesion
                     </Button>
                   </div>
