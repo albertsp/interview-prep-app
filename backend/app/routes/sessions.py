@@ -40,12 +40,16 @@ def create_session():
     
     db.session.commit()
     
+    saved_questions = Question.query.filter_by(session_id = new_session.session_id).all()
+
+    questions_data = [{"question_id": q.question_id, "question": q.question} for q in saved_questions] 
+
     # Devolvemos la sesion con las preguntas
     return jsonify({
                     "session_id": new_session.session_id,
                     "stack": new_session.stack,
                     "level": new_session.level,
-                    "questions": questions
+                    "questions": questions_data
                     }), 201
 
 
