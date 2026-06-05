@@ -5,41 +5,30 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldGroup } from "@/components/ui/field";
+import { registerUser } from "@/services/authService";
 
 export default function RegisterPage() {
+  // Estados locales para el formulario de registro
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Envia los datos de registro al backend y redirige al login
   async function handleSubmit(e) {
     e.preventDefault();
-    await fetchRegister(email, password);
-    router.push("/login");
-  }
-
-  async function fetchRegister(email, password) {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/auth/register`;
-    const data = { name, email, password };
+    setError(null);
+    setLoading(true);
 
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
-
-      const result = await response.json();
-      console.log("Register exitoso:", result);
-      return result;
-    } catch (error) {
-      console.error(error.message);
-      throw error;
+      await registerUser(name, email, password);
+      router.push("/login");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -79,8 +68,14 @@ export default function RegisterPage() {
           />
         </Field>
 
+        {error && (
+          <p className="text-destructive text-sm">{error}</p>
+        )}
+
         <Field orientation="horizontal">
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Creando cuenta..." : "Submit"}
+          </Button>
         </Field>
       </FieldGroup>
     </form>

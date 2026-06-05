@@ -6,42 +6,31 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldGroup } from "@/components/ui/field";
 import { useAuth } from "@/context/AuthContext";
+import { loginUser } from "@/services/authService";
 
 export default function LoginPage() {
+  // Estados locales para el formulario de login
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
 
+  // Envia las credenciales al backend y guarda la sesion en el contexto de auth
   async function handleSubmit(e) {
     e.preventDefault();
-    const result = await fetchLogin(email, password);
-    login(result.name, result.access_token);
-    router.push("/session");
-  }
-
-  async function fetchLogin(email, password) {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/auth/login`;
-    const data = { email, password };
+    setError(null);
+    setLoading(true);
 
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
-
-      const result = await response.json();
-      console.log("Login exitoso:", result);
-      return result;
-    } catch (error) {
-      console.error(error.message);
-      throw error;
+      const result = await loginUser(email, password);
+      login(result.name, result.access_token);
+      router.push("/session");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -70,8 +59,14 @@ export default function LoginPage() {
           />
         </Field>
 
+        {error && (
+          <p className="text-destructive text-sm">{error}</p>
+        )}
+
         <Field orientation="horizontal">
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Iniciando sesion..." : "Submit"}
+          </Button>
         </Field>
       </FieldGroup>
     </form>
