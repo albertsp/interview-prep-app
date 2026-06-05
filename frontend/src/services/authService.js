@@ -8,11 +8,23 @@ function headers() {
 
 // Maneja la respuesta del backend, lanzando error si no es OK
 async function handleResponse(response) {
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.Error || data.msg || data.message || "Error en la peticion");
+  // Si la respuesta es exitosa, parseamos el JSON directamente
+  if (response.ok) {
+    return response.json();
   }
-  return data;
+
+  // Si hay error, intentamos extraer el mensaje del body JSON del backend
+  // Si el body no es JSON (ej. HTML de error de Flask), mostramos el status
+  let errorMsg;
+  try {
+    const data = await response.json();
+    errorMsg = data.error || data.Error || data.msg || data.message;
+  } catch {
+    // El backend devolvio algo que no es JSON (HTML, texto plano, etc.)
+    errorMsg = null;
+  }
+
+  throw new Error(errorMsg || `Error ${response.status}: ${response.statusText}`);
 }
 
 // POST /auth/login — autentica al usuario y devuelve token JWT + datos del usuario
