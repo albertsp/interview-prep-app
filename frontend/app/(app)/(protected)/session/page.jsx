@@ -61,6 +61,11 @@ export default function SessionPage() {
     }
   };
 
+  // Actualiza los campos de la card en el estado del reducer
+  const handleCardChange = (updatedCard) => {
+    dispatch({ type: "UPDATE_CARD", payload: updatedCard });
+  };
+
   // Guarda la card de estudio en el backend y avanza a la siguiente pregunta
   const handleSaveCard = async () => {
     const question = state.questions[state.currentQuestionIndex];
@@ -72,6 +77,8 @@ export default function SessionPage() {
         concept: state.card.concept,
         explanation: state.card.explanation,
         use_case: state.card.use_case,
+        code: state.card.code,
+        code_language: state.card.code_language,
       });
     } catch (err) {
       console.error("Error al guardar la card:", err.message);
@@ -121,12 +128,12 @@ export default function SessionPage() {
           {/* Fase: esperando el feedback de la IA */}
           {state.currentPhase === "loading_feedback" && <FeedbackLoading />}
 
-          {/* Fase: feedback recibido, mostrar card y acciones */}
+          {/* Fase: feedback recibido, card editable con codigo */}
           {state.currentPhase === "waiting_action" && (
             <FeedbackPhase
               feedback={state.feedback}
               card={state.card}
-              onEdit={() => dispatch({ type: "EDIT_ANSWER" })}
+              onCardChange={handleCardChange}
               onDiscard={() => dispatch({ type: "CARD_DISCARDED" })}
               onSave={handleSaveCard}
             />

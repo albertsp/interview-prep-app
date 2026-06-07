@@ -41,6 +41,8 @@ def create_card():
         concept=data.get("concept"),
         explanation=data.get("explanation"),
         use_case=data.get("use_case"),
+        code=data.get("code"),
+        code_language=data.get("code_language", "javascript"),
     )
     db.session.add(new_card)
     db.session.commit()

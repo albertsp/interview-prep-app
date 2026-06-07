@@ -34,7 +34,7 @@ STRICT RULES:
 4. Be concise but thorough. Maximum 150 words.
 5. LANGUAGE: Write in Spanish but keep all technical terminology in English (hooks, callback, middleware, closure, etc.).
 6. TONE: Professional and constructive, like a senior developer giving feedback to a junior.
-7. JSON OUTPUT: Return a valid JSON object with this exact structure: {"result": "CORRECT|PARTIALLY_CORRECT|INCORRECT", "feedback": "your feedback here", "card": {"concept": "concept name", "explanation": "brief explanation", "use_case": "practical use case"}}. No markdown, no code blocks, just raw JSON.
+7. JSON OUTPUT: Return a valid JSON object with this exact structure: {"result": "CORRECT|PARTIALLY_CORRECT|INCORRECT", "feedback": "your feedback here", "card": {"concept": "concept name", "explanation": "brief explanation", "use_case": "practical use case", "code": "a short code snippet that illustrates the concept", "code_language": "javascript|python|typescript|etc"}}. The code field should be a relevant code example in the same language as the question. No markdown, no code blocks, just raw JSON.
 8. CRITICAL: Escape all double quotes inside strings with backslash. Escape all backslashes with double backslash. Do NOT use literal newlines inside JSON strings — use \\n instead.
 """
 client = Groq()
