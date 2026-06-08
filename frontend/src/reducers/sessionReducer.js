@@ -12,12 +12,26 @@ export const initialState = {
   currentAnswer: "",
   // Fase actual del flujo de entrevista
   currentPhase: "answering", // "answering" | "loading_feedback" | "waiting_action" | "complete"
+  // Resultado devuelto por la IA: CORRECT | PARTIALLY_CORRECT | INCORRECT
+  result: null,
   // Feedback devuelto por la IA para la respuesta actual
   feedback: null,
   // Card generada por la IA para la pregunta actual (editable por el usuario)
   card: null,
   // Snapshot de la card original de la IA, para detectar si el usuario la edito
   originalCard: null,
+  // XP ganado en esta sesion (lo devuelve POST /sessions/<id>/complete)
+  sessionXpEarned: 0,
+  // Total XP del usuario tras esta sesion
+  sessionTotalXp: 0,
+  // Nivel del usuario tras esta sesion
+  sessionLevel: 1,
+  // XP que faltan para el siguiente nivel tras esta sesion
+  sessionXpToNextLevel: 500,
+  // Si se aplico el bonus por completar todas las preguntas
+  sessionBonusApplied: false,
+  // Si el /complete ya se llamo y devolvio datos
+  sessionCompleteLoaded: false,
   // Mensaje de error para mostrar al usuario
   error: null,
 };
@@ -43,9 +57,16 @@ export function sessionReducer(state, action) {
         currentQuestionIndex: 0,
         currentAnswer: "",
         currentPhase: "answering",
+        result: null,
         feedback: null,
         card: null,
         originalCard: null,
+        sessionXpEarned: 0,
+        sessionTotalXp: 0,
+        sessionLevel: 1,
+        sessionXpToNextLevel: 500,
+        sessionBonusApplied: false,
+        sessionCompleteLoaded: false,
         error: null,
       };
     }
@@ -77,10 +98,12 @@ export function sessionReducer(state, action) {
       updatedQuestions[state.currentQuestionIndex] = {
         ...updatedQuestions[state.currentQuestionIndex],
         feedback: action.payload.feedback,
+        result: action.payload.result,
       };
       return {
         ...state,
         questions: updatedQuestions,
+        result: action.payload.result,
         feedback: action.payload.feedback,
         card: action.payload.card,
         // originalCard se congela aqui como snapshot inmutable para detectar ediciones
@@ -150,6 +173,23 @@ export function sessionReducer(state, action) {
     // Finaliza la sesion manualmente
     case "SESSION_ENDED":
       return { ...state, currentPhase: "complete", card: null, feedback: null };
+
+    // Guarda el resultado de POST /sessions/<id>/complete
+    case "SESSION_COMPLETED": {
+      const { xp_earned, total_xp, level, xp_to_next_level, bonus_applied } = action.payload;
+      return {
+        ...state,
+        currentPhase: "complete",
+        card: null,
+        feedback: null,
+        sessionXpEarned: xp_earned ?? 0,
+        sessionTotalXp: total_xp ?? 0,
+        sessionLevel: level ?? 1,
+        sessionXpToNextLevel: xp_to_next_level ?? 500,
+        sessionBonusApplied: !!bonus_applied,
+        sessionCompleteLoaded: true,
+      };
+    }
 
     // Guarda un mensaje de error para mostrar al usuario
     case "SET_ERROR":

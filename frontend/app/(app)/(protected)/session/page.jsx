@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useReducer } from "react";
+import { useState, useReducer, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { sessionReducer, initialState } from "@/reducers/sessionReducer";
-import { createSession, submitAnswer, saveCard } from "@/services/sessionService";
+import {
+  createSession,
+  submitAnswer,
+  saveCard,
+  completeSession,
+} from "@/services/sessionService";
 
 import SessionSetup from "@/components/session/SessionSetup";
 import ProgressIndicator from "@/components/session/ProgressIndicator";
@@ -15,8 +20,8 @@ import FeedbackPhase from "@/components/session/FeedbackPhase";
 import SessionComplete from "@/components/session/SessionComplete";
 
 export default function SessionPage() {
-  // Obtenemos el token JWT del contexto de autenticacion
-  const { token } = useAuth();
+  // Obtenemos el token JWT y el refrescador de stats del contexto
+  const { token, refreshStats } = useAuth();
   const router = useRouter();
   // Reducer que controla todo el flujo de la sesion
   const [state, dispatch] = useReducer(sessionReducer, initialState);
@@ -24,6 +29,8 @@ export default function SessionPage() {
   const [loading, setLoading] = useState(false);
   // Estado para mostrar errores en modo seleccion
   const [error, setError] = useState(null);
+  // Flag para evitar llamar a /complete mas de una vez por sesion
+  const completeCalledRef = useRef(false);
 
   // --- HANDLERS QUE ORQUESTAN EL FLUJO ---
 
@@ -35,6 +42,7 @@ export default function SessionPage() {
     try {
       const data = await createSession(token, select);
       dispatch({ type: "INIT_SESSION", payload: data });
+      completeCalledRef.current = false;
     } catch (err) {
       setError(err.message);
     } finally {
@@ -91,6 +99,41 @@ export default function SessionPage() {
     dispatch({ type: "CARD_SAVED" });
   };
 
+  // Cuando la sesion entra en fase "complete", calcula XP y refresca stats
+  useEffect(() => {
+    if (state.currentPhase !== "complete") return;
+    if (completeCalledRef.current) return;
+    completeCalledRef.current = true;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await completeSession(token, state.session_id);
+        if (cancelled) return;
+        dispatch({ type: "SESSION_COMPLETED", payload: data });
+        // Refrescamos las stats del navbar con los nuevos valores
+        refreshStats(token);
+      } catch (err) {
+        if (cancelled) return;
+        // Si falla, igual mostramos la pantalla de complete con XP 0
+        dispatch({
+          type: "SESSION_COMPLETED",
+          payload: {
+            xp_earned: 0,
+            total_xp: 0,
+            level: 1,
+            xp_to_next_level: 500,
+            bonus_applied: false,
+          },
+        });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [state.currentPhase, state.session_id, token, refreshStats]);
+
   // --- RENDERIZADO ---
 
   // Modo seleccion: no hay sesion activa, mostramos el setup
@@ -136,6 +179,7 @@ export default function SessionPage() {
           {state.currentPhase === "waiting_action" && (
             <FeedbackPhase
               feedback={state.feedback}
+              result={state.result}
               card={state.card}
               originalCard={state.originalCard}
               onCardChange={handleCardChange}
@@ -150,7 +194,16 @@ export default function SessionPage() {
               totalQuestions={state.questions.length}
               stack={state.stack}
               onDashboard={() => router.push("/dashboard")}
-              onNewSession={() => dispatch({ type: "RESET_SESSION" })}
+              onNewSession={() => {
+                completeCalledRef.current = false;
+                dispatch({ type: "RESET_SESSION" });
+              }}
+              xpEarned={state.sessionXpEarned}
+              totalXp={state.sessionTotalXp}
+              level={state.sessionLevel}
+              xpToNextLevel={state.sessionXpToNextLevel}
+              bonusApplied={state.sessionBonusApplied}
+              loading={!state.sessionCompleteLoaded}
             />
           )}
         </AnimatePresence>
