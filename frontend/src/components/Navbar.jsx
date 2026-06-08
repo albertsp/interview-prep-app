@@ -12,7 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import { LayoutDashboard, Play, LogOut, LogIn, UserPlus, Star } from "lucide-react"
+import { LayoutDashboard, Play, LogOut, LogIn, UserPlus, Star, BarChart3 } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
 function Navbar() {
@@ -56,6 +56,15 @@ function Navbar() {
             >
               <LayoutDashboard className="size-4" />
               Dashboard
+            </Button>
+            <Button
+              variant={isActive("/stats") ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => router.push("/stats")}
+              className="gap-2"
+            >
+              <BarChart3 className="size-4" />
+              Stats
             </Button>
             <Button
               variant={isActive("/session") ? "secondary" : "ghost"}
@@ -117,6 +126,10 @@ function Navbar() {
                 <DropdownMenuItem onClick={() => router.push("/dashboard")}>
                   <LayoutDashboard className="mr-2 size-4" />
                   Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/stats")}>
+                  <BarChart3 className="mr-2 size-4" />
+                  Stats
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push("/session")}>
                   <Play className="mr-2 size-4" />
