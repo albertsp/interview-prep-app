@@ -5,14 +5,74 @@ import MarkdownContent from "@/components/MarkdownContent";
 import CardEditor from "@/components/session/CardEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Save, Sparkles } from "lucide-react";
+import {
+  Trash2,
+  Save,
+  Sparkles,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Star,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+// Configuracion visual de cada resultado: color, icono, label, XP
+const RESULT_CONFIG = {
+  CORRECT: {
+    label: "Correcto",
+    icon: CheckCircle2,
+    classes: "bg-green-500/10 text-green-700 border-green-500/30 dark:text-green-400",
+    iconClasses: "text-green-600 dark:text-green-400",
+    xp: 100,
+  },
+  PARTIALLY_CORRECT: {
+    label: "Parcial",
+    icon: AlertTriangle,
+    classes: "bg-amber-500/10 text-amber-700 border-amber-500/30 dark:text-amber-400",
+    iconClasses: "text-amber-600 dark:text-amber-400",
+    xp: 50,
+  },
+  INCORRECT: {
+    label: "Incorrecto",
+    icon: XCircle,
+    classes: "bg-red-500/10 text-red-700 border-red-500/30 dark:text-red-400",
+    iconClasses: "text-red-600 dark:text-red-400",
+    xp: 10,
+  },
+};
+
+function ResultBadge({ result }) {
+  if (!result || !RESULT_CONFIG[result]) return null;
+  const config = RESULT_CONFIG[result];
+  const Icon = config.icon;
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.85 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", stiffness: 220, damping: 18 }}
+      className={cn(
+        "inline-flex items-center gap-2.5 rounded-full border-2 px-4 py-1.5 text-sm font-semibold",
+        config.classes
+      )}
+    >
+      <Icon className={cn("size-5", config.iconClasses)} />
+      <span>{config.label}</span>
+      <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-background/60 px-2 py-0.5 text-xs">
+        <Star className={cn("size-3", config.iconClasses)} />
+        +{config.xp} XP
+      </span>
+    </motion.div>
+  );
+}
 
 export default function FeedbackPhase({
   feedback,
   card,
+  result,
   onCardChange,
   onDiscard,
   onSave,
+  originalCard,
 }) {
   return (
     <motion.div
@@ -22,6 +82,11 @@ export default function FeedbackPhase({
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.25 }}
     >
+      {/* Badge grande con el resultado de la IA + XP ganado en esta pregunta */}
+      <div className="mb-4 flex justify-center">
+        <ResultBadge result={result} />
+      </div>
+
       {/* Seccion de feedback de la IA */}
       <Card className="mb-6">
         <CardHeader className="pb-2">
@@ -38,8 +103,14 @@ export default function FeedbackPhase({
         </CardContent>
       </Card>
 
-      {/* Card de estudio editable inline */}
-      {card && <CardEditor card={card} onChange={onCardChange} />}
+      {/* Card de estudio: alterna entre modo Ver y Editar */}
+      {card && (
+        <CardEditor
+          card={card}
+          onChange={onCardChange}
+          originalCard={originalCard}
+        />
+      )}
 
       {/* Botones de accion: descartar o guardar */}
       <div className="flex justify-end gap-2">

@@ -1,21 +1,43 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from ..constants.stacks import VALID_LEVELS,VALID_STACKS
+from ..constants.stacks import VALID_LEVELS, VALID_STACKS
 from ..models.session import Session
 from ..models.question import Question
+from ..models.user import User
 from .. import db
 from ..services.ai_service import generate_questions, generate_feedback
 
-sessions = Blueprint('sessions',__name__,url_prefix='/sessions')
+sessions = Blueprint('sessions', __name__, url_prefix='/sessions')
+
+# --- Gamificación: configuración de XP ---
+XP_PER_RESULT = {
+    "CORRECT": 100,
+    "PARTIALLY_CORRECT": 50,
+    "INCORRECT": 10,
+}
+XP_COMPLETION_BONUS = 50
+XP_PER_LEVEL = 500
+
+
+def compute_level(total_xp):
+    """Nivel = floor(total_xp / XP_PER_LEVEL) + 1. Nivel 1 desde 0 XP."""
+    return (total_xp // XP_PER_LEVEL) + 1
+
+
+def xp_to_next_level(total_xp):
+    """XP que faltan para subir al siguiente nivel."""
+    current_level = compute_level(total_xp)
+    next_level_threshold = current_level * XP_PER_LEVEL
+    return max(0, next_level_threshold - total_xp)
 
 
 @sessions.route('/', methods=['POST'])
 # Protegemos el endpoint con JWT
-@jwt_required()                         
+@jwt_required()
 def create_session():
 
     # Extraemos user_id del token
-    user_id = get_jwt_identity()        
+    user_id = get_jwt_identity()
 
     # Obtenemos el body y accedemos a los campos
     data = request.get_json()
@@ -24,41 +46,41 @@ def create_session():
 
     # Validamos que el stack y el nivel pertenece a la lista permitida
     if stack not in VALID_STACKS or level not in VALID_LEVELS:
-        return jsonify({"Error":"El stack seleccionado o el nivel no estan permitidos"}), 400
-    
+        return jsonify({"Error": "El stack seleccionado o el nivel no estan permitidos"}), 400
+
     # Creamos sesion en BD
-    new_session = Session(user_id=user_id,stack=stack,level=level)
+    new_session = Session(user_id=user_id, stack=stack, level=level)
     db.session.add(new_session)
     db.session.commit()
-    
+
     # Generamos preguntas
-    questions = generate_questions(stack,level)
+    questions = generate_questions(stack, level)
 
     # Guardamos cada pregunta como registro Question en BD de la session actual
     for question in questions:
-        db.session.add(Question(question=question,session_id=new_session.session_id))
-    
-    db.session.commit()
-    
-    saved_questions = Question.query.filter_by(session_id = new_session.session_id).all()
+        db.session.add(Question(question=question, session_id=new_session.session_id))
 
-    questions_data = [{"question_id": q.question_id, "question": q.question} for q in saved_questions] 
+    db.session.commit()
+
+    saved_questions = Question.query.filter_by(session_id=new_session.session_id).all()
+
+    questions_data = [{"question_id": q.question_id, "question": q.question} for q in saved_questions]
 
     # Devolvemos la sesion con las preguntas
     return jsonify({
-                    "session_id": new_session.session_id,
-                    "stack": new_session.stack,
-                    "level": new_session.level,
-                    "questions": questions_data
-                    }), 201
+        "session_id": new_session.session_id,
+        "stack": new_session.stack,
+        "level": new_session.level,
+        "questions": questions_data
+    }), 201
 
 
 @sessions.route('/<int:session_id>/questions/<int:question_id>', methods=['PATCH'])
 # Protegemos el endpoint con JWT
-@jwt_required() 
+@jwt_required()
 def answer_question(session_id, question_id):
     # Extraemos user_id del token
-    user_id = get_jwt_identity() 
+    user_id = get_jwt_identity()
 
     # Guardamos el body de la peticion
     data = request.get_json()
@@ -68,10 +90,10 @@ def answer_question(session_id, question_id):
 
     # Si no existe devolvemos error
     if user_sesion is None:
-        return jsonify({"msg": "La sesión no existe"}),404
+        return jsonify({"msg": "La sesión no existe"}), 404
 
     # Buscamos la pregunta por id
-    user_question = Question.query.filter_by(question_id=question_id,session_id=session_id).first()
+    user_question = Question.query.filter_by(question_id=question_id, session_id=session_id).first()
 
     # Si no existe devolvemos error
     if user_question is None:
@@ -82,13 +104,69 @@ def answer_question(session_id, question_id):
     db.session.commit()
 
     # Generamos el feedback de la respuesta y guardamos en BD
-    result = generate_feedback(user_question.question, data.get("answer"))
+    result = generate_feedback(user_sesion.stack, user_question.question, data.get("answer"))
     user_question.feedback = result["feedback"]
+    user_question.result = result["result"]
     db.session.commit()
 
     return jsonify({
-                    "session_id": session_id,
-                    "question_id": question_id,
-                    "feedback": user_question.feedback,
-                    "card": result["card"]
-                    }), 200
+        "session_id": session_id,
+        "question_id": question_id,
+        "result": result["result"],
+        "feedback": user_question.feedback,
+        "card": result["card"]
+    }), 200
+
+
+@sessions.route('/<int:session_id>/complete', methods=['POST'])
+# Protegemos el endpoint con JWT
+@jwt_required()
+def complete_session(session_id):
+    """Calcula XP ganado en la sesion, actualiza User y devuelve stats."""
+    user_id = get_jwt_identity()
+
+    # Validamos que la sesion pertenece al usuario
+    user_session = Session.query.filter_by(session_id=session_id, user_id=user_id).first()
+    if user_session is None:
+        return jsonify({"msg": "La sesion no existe"}), 404
+
+    # Obtenemos todas las preguntas respondidas
+    questions = Question.query.filter_by(session_id=session_id).all()
+    answered = [q for q in questions if q.result is not None]
+
+    # Calculamos XP por resultado
+    breakdown = []
+    xp_earned = 0
+    for q in answered:
+        xp = XP_PER_RESULT.get(q.result, 0)
+        xp_earned += xp
+        breakdown.append({
+            "question_id": q.question_id,
+            "result": q.result,
+            "xp": xp,
+        })
+
+    # Bonus por completar todas las preguntas de la sesion
+    bonus_applied = False
+    if len(answered) == len(questions) and len(questions) > 0:
+        xp_earned += XP_COMPLETION_BONUS
+        bonus_applied = True
+
+    # Actualizamos XP total y nivel del usuario
+    user = User.query.filter_by(user_id=user_id).first()
+    if user is None:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+
+    user.total_xp = (user.total_xp or 0) + xp_earned
+    user.level = compute_level(user.total_xp)
+    db.session.commit()
+
+    return jsonify({
+        "session_id": session_id,
+        "xp_earned": xp_earned,
+        "bonus_applied": bonus_applied,
+        "total_xp": user.total_xp,
+        "level": user.level,
+        "xp_to_next_level": xp_to_next_level(user.total_xp),
+        "breakdown": breakdown,
+    }), 200

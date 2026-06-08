@@ -7,5 +7,8 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    email = db.Column(db.String(250), unique=True) 
+    email = db.Column(db.String(250), unique=True)
     password = db.Column(db.String(250), nullable=False)
+    # Gamificacion: XP acumulado y nivel actual del usuario
+    total_xp = db.Column(db.Integer, nullable=False, default=0)
+    level = db.Column(db.Integer, nullable=False, default=1)

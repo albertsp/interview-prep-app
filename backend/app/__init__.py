@@ -26,6 +26,7 @@ def create_app():
     from .routes.stacks import stacks
     from .routes.sessions import sessions
     from .routes.cards import cards
+    from .routes.user import user
     
     Migrate(app, db)                    # Habilita migraciones de base de datos con Flask
 
@@ -58,6 +59,7 @@ def create_app():
     app.register_blueprint(stacks)
     app.register_blueprint(sessions)
     app.register_blueprint(cards)
+    app.register_blueprint(user)
 
     return app
 

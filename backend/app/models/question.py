@@ -10,3 +10,5 @@ class Question(db.Model):
     answer = db.Column(db.Text(), nullable=True)
     session_id = db.Column(db.Integer,db.ForeignKey(Session.session_id))
     feedback = db.Column(db.Text(), nullable=True)
+    # Resultado devuelto por la IA: CORRECT, PARTIALLY_CORRECT, INCORRECT
+    result = db.Column(db.String(20), nullable=True)
