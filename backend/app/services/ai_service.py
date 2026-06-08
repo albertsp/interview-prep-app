@@ -37,6 +37,7 @@ STRICT RULES:
 5. LANGUAGE: Write feedback in Spanish but keep all technical terminology in English (hooks, callback, middleware, closure, etc.).
 6. TONE: Professional and constructive, like a senior developer giving feedback to a junior.
 7. CARD CONTENT RULES (the card is what the candidate will review later):
+   - "concept": short title of the concept, max 6 words. ALWAYS non-empty. This is the card heading.
    - "definition": one-sentence technical definition of the concept, max 25 words.
    - "explanation": thorough clarification of the concept, max 80 words.
    - "use_case": practical use case, max 40 words.
@@ -46,7 +47,7 @@ STRICT RULES:
    - "code_language": the language identifier ("javascript", "typescript", "python", "sql", "html", "css", "bash", "json", etc.) matching the stack.
    - "tags": array of 2-4 short lowercase strings that categorize the concept (e.g. ["async", "promises", "error-handling"]).
 8. JSON OUTPUT: Return a valid JSON object with this exact structure:
-   {"result": "CORRECT|PARTIALLY_CORRECT|INCORRECT", "feedback": "...", "card": {"definition": "...", "explanation": "...", "use_case": "...", "avoid_when": "...", "mnemonic": "...", "code": "...", "code_language": "...", "tags": ["...", "..."]}}
+   {"result": "CORRECT|PARTIALLY_CORRECT|INCORRECT", "feedback": "...", "card": {"concept": "...", "definition": "...", "explanation": "...", "use_case": "...", "avoid_when": "...", "mnemonic": "...", "code": "...", "code_language": "...", "tags": ["...", "..."]}}
    No markdown, no code blocks wrapping the JSON, just raw JSON.
 9. CRITICAL: Escape all double quotes inside strings with backslash. Escape all backslashes with double backslash. Do NOT use literal newlines inside JSON strings — use \\n instead.
 """
@@ -54,6 +55,7 @@ client = Groq()
 
 # Estructura minima de una respuesta valida de la IA para feedback.
 EMPTY_CARD = {
+    "concept": "",
     "definition": "",
     "explanation": "",
     "use_case": "",
