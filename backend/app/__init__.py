@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from .config import Config
 from flask_cors import CORS
 from flask_migrate import Migrate
-from .routes.main import main
 from flask_jwt_extended import JWTManager
 
 
@@ -55,7 +54,6 @@ def create_app():
     )
 
 
-    app.register_blueprint(main)
     app.register_blueprint(auth)
     app.register_blueprint(stacks)
     app.register_blueprint(sessions)
