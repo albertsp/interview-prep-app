@@ -75,8 +75,12 @@ export default function SessionPage() {
         question_id: question.question_id,
         session_id: state.session_id,
         concept: state.card.concept,
+        definition: state.card.definition,
         explanation: state.card.explanation,
         use_case: state.card.use_case,
+        avoid_when: state.card.avoid_when,
+        mnemonic: state.card.mnemonic,
+        tags: state.card.tags,
         code: state.card.code,
         code_language: state.card.code_language,
       });
@@ -133,6 +137,7 @@ export default function SessionPage() {
             <FeedbackPhase
               feedback={state.feedback}
               card={state.card}
+              originalCard={state.originalCard}
               onCardChange={handleCardChange}
               onDiscard={() => dispatch({ type: "CARD_DISCARDED" })}
               onSave={handleSaveCard}

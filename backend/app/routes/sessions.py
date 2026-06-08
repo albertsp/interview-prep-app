@@ -82,7 +82,7 @@ def answer_question(session_id, question_id):
     db.session.commit()
 
     # Generamos el feedback de la respuesta y guardamos en BD
-    result = generate_feedback(user_question.question, data.get("answer"))
+    result = generate_feedback(user_sesion.stack, user_question.question, data.get("answer"))
     user_question.feedback = result["feedback"]
     db.session.commit()
 

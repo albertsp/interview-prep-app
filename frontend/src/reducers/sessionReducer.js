@@ -14,8 +14,10 @@ export const initialState = {
   currentPhase: "answering", // "answering" | "loading_feedback" | "waiting_action" | "complete"
   // Feedback devuelto por la IA para la respuesta actual
   feedback: null,
-  // Card generada por la IA para la pregunta actual
+  // Card generada por la IA para la pregunta actual (editable por el usuario)
   card: null,
+  // Snapshot de la card original de la IA, para detectar si el usuario la edito
+  originalCard: null,
   // Mensaje de error para mostrar al usuario
   error: null,
 };
@@ -43,6 +45,7 @@ export function sessionReducer(state, action) {
         currentPhase: "answering",
         feedback: null,
         card: null,
+        originalCard: null,
         error: null,
       };
     }
@@ -80,6 +83,8 @@ export function sessionReducer(state, action) {
         questions: updatedQuestions,
         feedback: action.payload.feedback,
         card: action.payload.card,
+        // originalCard se congela aqui como snapshot inmutable para detectar ediciones
+        originalCard: action.payload.card,
         currentPhase: "waiting_action",
       };
     }

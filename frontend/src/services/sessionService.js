@@ -54,11 +54,35 @@ export async function submitAnswer(token, sessionId, questionId, answer) {
 }
 
 // POST /cards/ — guarda una card de estudio en el backend
-export async function saveCard(token, { question_id, session_id, concept, explanation, use_case, code, code_language }) {
+export async function saveCard(token, {
+  question_id,
+  session_id,
+  concept,
+  definition,
+  explanation,
+  use_case,
+  avoid_when,
+  mnemonic,
+  tags,
+  code,
+  code_language,
+}) {
   const response = await fetch(`${API_URL}/cards/`, {
     method: "POST",
     headers: headers(token),
-    body: JSON.stringify({ question_id, session_id, concept, explanation, use_case, code, code_language }),
+    body: JSON.stringify({
+      question_id,
+      session_id,
+      concept,
+      definition,
+      explanation,
+      use_case,
+      avoid_when,
+      mnemonic,
+      tags,
+      code,
+      code_language,
+    }),
   });
   return handleResponse(response);
 }

@@ -13,6 +13,7 @@ export default function FeedbackPhase({
   onCardChange,
   onDiscard,
   onSave,
+  originalCard,
 }) {
   return (
     <motion.div
@@ -38,8 +39,14 @@ export default function FeedbackPhase({
         </CardContent>
       </Card>
 
-      {/* Card de estudio editable inline */}
-      {card && <CardEditor card={card} onChange={onCardChange} />}
+      {/* Card de estudio: alterna entre modo Ver y Editar */}
+      {card && (
+        <CardEditor
+          card={card}
+          onChange={onCardChange}
+          originalCard={originalCard}
+        />
+      )}
 
       {/* Botones de accion: descartar o guardar */}
       <div className="flex justify-end gap-2">

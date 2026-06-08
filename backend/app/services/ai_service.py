@@ -23,23 +23,54 @@ STRICT FORMAT AND CONTENT RULES:
 
 
 SYSTEM_PROMPT_FEEDBACK = """
-You are an expert technical interviewer evaluating a candidate's answer to a JavaScript/web development interview question.
+You are an expert technical interviewer evaluating a candidate's answer.
 
-Your task is to provide clear, constructive feedback on the candidate's answer.
+The technology stack will be specified in the user's message. Adapt code examples, terminology and depth to THAT stack (do not default to JavaScript).
+
+Your task is to provide clear, constructive feedback AND generate a study card from the topic that the candidate should remember.
 
 STRICT RULES:
-1. Start by indicating if the answer is CORRECT, PARTIALLY CORRECT, or INCORRECT.
+1. Start by indicating if the answer is CORRECT, PARTIALLY_CORRECT, or INCORRECT.
 2. Explain specifically what was right and what was wrong.
 3. If the answer was wrong or incomplete, provide the correct solution with a code example.
-4. Be concise but thorough. Maximum 150 words.
-5. LANGUAGE: Write in Spanish but keep all technical terminology in English (hooks, callback, middleware, closure, etc.).
+4. Be concise but thorough. Maximum 150 words for the feedback.
+5. LANGUAGE: Write feedback in Spanish but keep all technical terminology in English (hooks, callback, middleware, closure, etc.).
 6. TONE: Professional and constructive, like a senior developer giving feedback to a junior.
-7. JSON OUTPUT: Return a valid JSON object with this exact structure: {"result": "CORRECT|PARTIALLY_CORRECT|INCORRECT", "feedback": "your feedback here", "card": {"concept": "concept name", "explanation": "brief explanation", "use_case": "practical use case", "code": "a short code snippet that illustrates the concept", "code_language": "javascript|python|typescript|etc"}}. The code field should be a relevant code example in the same language as the question. No markdown, no code blocks, just raw JSON.
-8. CRITICAL: Escape all double quotes inside strings with backslash. Escape all backslashes with double backslash. Do NOT use literal newlines inside JSON strings — use \\n instead.
+7. CARD CONTENT RULES (the card is what the candidate will review later):
+   - "definition": one-sentence technical definition of the concept, max 25 words.
+   - "explanation": thorough clarification of the concept, max 80 words.
+   - "use_case": practical use case, max 40 words.
+   - "avoid_when": when NOT to use this (anti-pattern), max 40 words. Empty string if not applicable.
+   - "mnemonic": short memory aid or analogy, max 15 words. Empty string if not applicable.
+   - "code": a SHORT code snippet in the SAME language as the question's stack, max 10 lines. Empty string if the concept is purely theoretical.
+   - "code_language": the language identifier ("javascript", "typescript", "python", "sql", "html", "css", "bash", "json", etc.) matching the stack.
+   - "tags": array of 2-4 short lowercase strings that categorize the concept (e.g. ["async", "promises", "error-handling"]).
+8. JSON OUTPUT: Return a valid JSON object with this exact structure:
+   {"result": "CORRECT|PARTIALLY_CORRECT|INCORRECT", "feedback": "...", "card": {"definition": "...", "explanation": "...", "use_case": "...", "avoid_when": "...", "mnemonic": "...", "code": "...", "code_language": "...", "tags": ["...", "..."]}}
+   No markdown, no code blocks wrapping the JSON, just raw JSON.
+9. CRITICAL: Escape all double quotes inside strings with backslash. Escape all backslashes with double backslash. Do NOT use literal newlines inside JSON strings — use \\n instead.
 """
 client = Groq()
 
-# Limpia y sanitiza la respuesta del modelo antes de parsear JSON
+# Estructura minima de una respuesta valida de la IA para feedback.
+EMPTY_CARD = {
+    "definition": "",
+    "explanation": "",
+    "use_case": "",
+    "avoid_when": "",
+    "mnemonic": "",
+    "code": "",
+    "code_language": "javascript",
+    "tags": [],
+}
+
+EMPTY_FEEDBACK = {
+    "result": "PARTIALLY_CORRECT",
+    "feedback": "La IA no devolvio una respuesta valida. Por favor, intentalo de nuevo.",
+    "card": EMPTY_CARD,
+}
+
+
 def _parse_ai_json(raw_content):
     content = raw_content.strip()
 
@@ -52,46 +83,76 @@ def _parse_ai_json(raw_content):
     return json.loads(content, strict=False)
 
 
-def generate_questions(stack,level):
-    
+def _safe_card(card_data):
+    """Devuelve un dict de card con todos los campos esperados, rellenando los faltantes."""
+    if not isinstance(card_data, dict):
+        return dict(EMPTY_CARD)
+    safe = dict(EMPTY_CARD)
+    for key in safe.keys():
+        if key in card_data and card_data[key] is not None:
+            safe[key] = card_data[key]
+    if not isinstance(safe["tags"], list):
+        safe["tags"] = []
+    return safe
+
+
+def _safe_feedback(data):
+    """Normaliza la respuesta de la IA al formato esperado, con fallbacks."""
+    if not isinstance(data, dict):
+        return dict(EMPTY_FEEDBACK)
+    result = data.get("result", "").upper()
+    if result not in ("CORRECT", "PARTIALLY_CORRECT", "INCORRECT"):
+        result = "PARTIALLY_CORRECT"
+    return {
+        "result": result,
+        "feedback": data.get("feedback") or EMPTY_FEEDBACK["feedback"],
+        "card": _safe_card(data.get("card")),
+    }
+
+
+def generate_questions(stack, level):
     chat_completion = client.chat.completions.create(
-    messages=[
-        # Set an optional system message. This sets the behavior of the
-        # assistant and can be used to provide specific instructions for
-        # how it should behave throughout the conversation.
-        {
-            "role": "system",
-            "content": SYSTEM_PROMPT_QUESTIONS
-        },
-        # Set a user message for the assistant to respond to.
-        {
-            "role": "user",
-            "content": f"Generate 5 interview questions for {stack} at {level} level.",
-        }
-    ],
-
-    # The language model which will generate the completion.
-    model="llama-3.3-70b-versatile"
-)
-    return _parse_ai_json(chat_completion.choices[0].message.content)
-
-def generate_feedback(question,answer):
-
-    chat_completion = client.chat.completions.create(
-        messages= [
+        messages=[
             {
                 "role": "system",
-                "content": SYSTEM_PROMPT_FEEDBACK,
+                "content": SYSTEM_PROMPT_QUESTIONS,
             },
             {
                 "role": "user",
-                "content": f"Generate feedback from this answer: {answer} to this question: {question}",
-            },
+                "content": f"Generate 5 interview questions for {stack} at {level} level.",
+            }
         ],
         model="llama-3.3-70b-versatile"
     )
     return _parse_ai_json(chat_completion.choices[0].message.content)
 
 
+def generate_feedback(stack, question, answer):
+    """Devuelve un dict con keys: result, feedback, card. Nunca lanza excepcion."""
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": SYSTEM_PROMPT_FEEDBACK,
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        f"Stack: {stack or 'unspecified'}\n"
+                        f"Question: {question}\n"
+                        f"Answer: {answer}"
+                    ),
+                },
+            ],
+            model="llama-3.3-70b-versatile"
+        )
+        raw = chat_completion.choices[0].message.content
+        parsed = _parse_ai_json(raw)
+        return _safe_feedback(parsed)
+    except Exception:
+        return dict(EMPTY_FEEDBACK)
+
+
 if __name__ == "_main__":
-    generate_questions("JavaScript","Basico")
+    generate_questions("JavaScript", "Basico")
