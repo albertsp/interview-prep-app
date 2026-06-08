@@ -15,11 +15,11 @@ const STEPS = [
     description: "Revisá cada pregunta con su respuesta explicada y guardadas en tu historial.",
   },
 ];
- 
+
 export default function HowItWorks() {
   return (
     <section className="w-full px-6 py-20 bg-gray-50">
-       
+
       <div className="text-center mb-12">
         <h2 className="text-3xl font-bold text-gray-900 mb-3">
           Cómo funciona
@@ -28,12 +28,12 @@ export default function HowItWorks() {
           Tres pasos para prepararte para tu próxima entrevista.
         </p>
       </div>
- 
+
       {/* Steps */}
       <div className="flex flex-col sm:flex-row items-start justify-center gap-8 max-w-2xl mx-auto">
         {STEPS.map(({ number, title, description }, index) => (
           <div key={number} className="flex flex-col items-center text-center gap-4 flex-1">
- 
+
             {/* Number + connector */}
             <div className="flex items-center w-full justify-center gap-2">
               {/* Left line */}
@@ -48,18 +48,17 @@ export default function HowItWorks() {
                 <div className="hidden sm:block flex-1 h-px bg-gray-200" />
               )}
             </div>
- 
+
             {/* Text */}
             <div className="flex flex-col gap-1">
               <h3 className="text-base font-bold text-gray-900">{title}</h3>
               <p className="text-sm text-gray-400 leading-relaxed">{description}</p>
             </div>
- 
+
           </div>
         ))}
       </div>
- 
+
     </section>
   );
 }
- 

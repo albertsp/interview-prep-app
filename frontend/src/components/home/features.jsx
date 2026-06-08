@@ -20,11 +20,11 @@ const FEATURES = [
     description: "Todas tus cards quedan guardadas en tu cuenta. Volvé a practicar cuando quieras.",
   },
 ];
- 
+
 export default function Features() {
   return (
     <section className="w-full px-6 py-20 bg-white">
-          
+
       <div className="text-center mb-12">
         <h2 className="text-3xl font-bold text-gray-900 mb-3">
           Todo lo que necesitás para prepararte
@@ -33,7 +33,7 @@ export default function Features() {
           Una herramienta completa, simple y potenciada por IA.
         </p>
       </div>
-       
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
         {FEATURES.map(({ icon, title, description }) => (
           <div
@@ -46,7 +46,7 @@ export default function Features() {
           </div>
         ))}
       </div>
- 
+
     </section>
   );
 }

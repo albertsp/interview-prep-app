@@ -1,11 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import CTA from "components/cta";
-import Features from "components/features";
-import Hero from "components/hero";
-import HowItWorks from "components/howitworks";
-import Techs from "components/techs";
+import CTA from "@/components/home/cta";
+import Features from "@/components/home/features";
+import Hero from "@/components/home/hero";
+import HowItWorks from "@/components/home/howitworks";
+import Techs from "@/components/home/techs";
 
 export default function HomePage() {
   return (

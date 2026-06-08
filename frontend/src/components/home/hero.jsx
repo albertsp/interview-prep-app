@@ -1,3 +1,4 @@
+"use client";
 
 import Link from "next/link";
 import { useRouter} from "next/navigation"
@@ -27,9 +28,9 @@ export default function Hero() {
         Configura tu entrevista personalizada en tres pasos
       </p>
 
-      
+
       <div className="flex flex-wrap gap-3 justify-center mb-16">
-        
+
         <button
           onClick={() => router.push("/register")}
           className="px-6 py-3 rounded-2xl bg-gray-900 text-white text-sm font-medium hover:bg-gray-700 transition-colors"
@@ -38,7 +39,7 @@ export default function Hero() {
         </button>
       </div>
 
-      
+
       <div className="flex gap-12 justify-center">
         {STATS.map(({ value, label }) => (
           <div key={label} className="flex flex-col items-center gap-1">
