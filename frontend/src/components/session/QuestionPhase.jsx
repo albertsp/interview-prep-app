@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import MarkdownContent from "@/components/MarkdownContent";
+import CodeEditor from "@/components/CodeEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Send } from "lucide-react";
+import { Send, Code, AlignLeft } from "lucide-react";
 
 export default function QuestionPhase({
   question,
@@ -14,6 +16,9 @@ export default function QuestionPhase({
   onAnswerChange,
   onSubmit,
 }) {
+  // Alterna entre modo texto (textarea) y modo codigo (CodeMirror)
+  const [isCodeMode, setIsCodeMode] = useState(false);
+
   return (
     <motion.div
       key="answering"
@@ -28,17 +33,61 @@ export default function QuestionPhase({
         </CardContent>
       </Card>
 
-      <textarea
-        className={cn(
-          "w-full min-h-[160px] rounded-xl border border-input bg-background px-5 py-4 text-base resize-y transition-colors outline-none",
-          "placeholder:text-muted-foreground",
-          "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
-          "disabled:pointer-events-none disabled:opacity-50"
-        )}
-        placeholder="Escribe tu respuesta aqui..."
-        value={answer}
-        onChange={(e) => onAnswerChange(e.target.value)}
-      />
+      {/* Toggle texto / codigo */}
+      <div className="flex items-center justify-end gap-1 mb-3">
+        <span className="text-xs text-muted-foreground mr-2">
+          {isCodeMode ? "Editor de codigo" : "Texto"}
+        </span>
+        <div className="flex rounded-lg border border-border bg-muted p-0.5">
+          <button
+            type="button"
+            onClick={() => setIsCodeMode(false)}
+            className={cn(
+              "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+              !isCodeMode
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <AlignLeft className="size-3.5" />
+            Texto
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsCodeMode(true)}
+            className={cn(
+              "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+              isCodeMode
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Code className="size-3.5" />
+            Codigo
+          </button>
+        </div>
+      </div>
+
+      {/* Editor: textarea o CodeMirror segun el modo */}
+      {isCodeMode ? (
+        <CodeEditor
+          value={answer}
+          onChange={onAnswerChange}
+          placeholder="Escribe tu codigo aqui..."
+        />
+      ) : (
+        <textarea
+          className={cn(
+            "w-full min-h-[200px] rounded-xl border border-input bg-background px-5 py-4 text-base resize-y transition-colors outline-none",
+            "placeholder:text-muted-foreground",
+            "focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
+            "disabled:pointer-events-none disabled:opacity-50"
+          )}
+          placeholder="Escribe tu respuesta aqui..."
+          value={answer}
+          onChange={(e) => onAnswerChange(e.target.value)}
+        />
+      )}
 
       {error && (
         <motion.p
