@@ -22,5 +22,9 @@ class Card(db.Model):
     explanation = db.Column(db.Text(), nullable=False)
     # Caso de uso practico del concepto
     use_case = db.Column(db.Text(), nullable=False)
+    # Snippet de codigo de ejemplo
+    code = db.Column(db.Text(), nullable=True)
+    # Lenguaje del snippet de codigo
+    code_language = db.Column(db.String(50), nullable=True, default="javascript")
     # Fecha de creacion de la card
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { configSelect } from "../data/stacks"
 import { Button } from "./ui/button"
 import { Card, CardContent, CardFooter } from "./ui/card"
 import { motion, AnimatePresence } from "framer-motion"
@@ -20,7 +19,7 @@ const steps = [
   { key: "level", label: "Nivel", question: "¿Qué nivel de dificultad prefieres?" },
 ]
 
-function StackSelector({ onSubmit }) {
+function StackSelector({ onSubmit, stacks }) {
   // select: guarda lo elegido en cada paso
   // step: índice del paso actual (0, 1, 2)
   const [select, setSelect] = useState({ rol: "", stack: "", level: "" })
@@ -139,7 +138,7 @@ function StackSelector({ onSubmit }) {
                   <h2 className="text-2xl font-semibold">{steps[0].question}</h2>
                   <p className="text-base text-muted-foreground mt-2">Elige el área que más te interese</p>
                 </div>
-                {renderOptions(Object.keys(configSelect.rol), "rol", select.rol, roleIcons)}
+                {renderOptions(Object.keys(stacks.rol), "rol", select.rol, roleIcons)}
               </motion.div>
             )}
 
@@ -158,7 +157,7 @@ function StackSelector({ onSubmit }) {
                     Rol: <span className="font-medium text-foreground">{select.rol}</span>
                   </p>
                 </div>
-                {renderOptions(configSelect.rol[select.rol], "stack", select.stack)}
+                {renderOptions(stacks.rol[select.rol], "stack", select.stack)}
               </motion.div>
             )}
 
@@ -177,7 +176,7 @@ function StackSelector({ onSubmit }) {
                     {select.rol} · <span className="font-medium text-foreground">{select.stack}</span>
                   </p>
                 </div>
-                {renderOptions(configSelect.level, "level", select.level)}
+                {renderOptions(stacks.level, "level", select.level)}
               </motion.div>
             )}
           </AnimatePresence>

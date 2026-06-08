@@ -84,14 +84,11 @@ export function sessionReducer(state, action) {
       };
     }
 
-    // El usuario quiere volver a editar su respuesta
-    case "EDIT_ANSWER":
+    // El usuario edita los campos de la card en el editor inline
+    case "UPDATE_CARD":
       return {
         ...state,
-        currentPhase: "answering",
-        feedback: null,
-        card: null,
-        error: null,
+        card: { ...state.card, ...action.payload },
       };
 
     // Avanza a la siguiente pregunta o termina la sesion si no hay mas
