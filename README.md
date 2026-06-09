@@ -31,8 +31,8 @@
 | Estado global | React Context (AuthContext) |
 | IA | Groq API |
 | Base de datos (dev) | PostgreSQL 16 (Docker) |
-| Base de datos (prod) | PostgreSQL (Render) |
-| Deploy | Render |
+| Base de datos (prod) | PostgreSQL (Fly.io) |
+| Deploy | Vercel |
 
 ---
 
