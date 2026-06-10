@@ -2,7 +2,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import "@/index.css";
 
 export const metadata = {
-  title: "Interview Prep",
+  title: "InterviewKit",
   description: "Practica para tu próxima entrevista técnica",
   icons: {
     icon: "/favicon.svg",
