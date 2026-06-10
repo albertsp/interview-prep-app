@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -15,44 +16,65 @@ import {
 import { LayoutDashboard, Play, LogOut, LogIn, UserPlus, Star, BarChart3 } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
+const BRAND = "InterviewKit"
+
+function BrandText() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return <span className="text-xl font-bold tracking-tight">{BRAND}</span>
+  }
+
+  return (
+    <span className="text-xl font-bold tracking-tight">
+      {BRAND.split("").map((char, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.03, duration: 0.3, ease: "easeOut" }}
+          className="inline-block"
+        >
+          {char}
+        </motion.span>
+      ))}
+    </span>
+  )
+}
+
 function Navbar() {
   const { token, user, stats, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
   const initials = user ? user.charAt(0).toUpperCase() : "U"
 
-  // Determina que links estan activos segun la ruta actual
   const isActive = (path) => pathname === path
 
-  // Progreso hacia el siguiente nivel en porcentaje (para la barrita)
-  const progressPct = stats.xp_per_level > 0
-    ? Math.min(100, Math.round((stats.progress_in_level / stats.xp_per_level) * 100))
-    : 0
-
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        {/* Logo + nombre */}
+    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
+        {/* Brand */}
         <motion.button
           onClick={() => router.push("/")}
-          className="flex items-center gap-3 rounded-lg outline-none cursor-pointer"
+          className="outline-none cursor-pointer select-none"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <div className="flex size-10 items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground">
-            IP
-          </div>
-          <span className="text-lg font-semibold tracking-tight">Interview Prep</span>
+          <BrandText />
         </motion.button>
 
-        {/* Links de navegacion (solo si esta autenticado) */}
+        {/* Nav links (solo si esta autenticado) */}
         {token && (
           <nav className="hidden md:flex items-center gap-1">
             <Button
               variant={isActive("/dashboard") ? "secondary" : "ghost"}
               size="sm"
               onClick={() => router.push("/dashboard")}
-              className="gap-2"
+              className="gap-2 text-sm"
             >
               <LayoutDashboard className="size-4" />
               Dashboard
@@ -61,7 +83,7 @@ function Navbar() {
               variant={isActive("/stats") ? "secondary" : "ghost"}
               size="sm"
               onClick={() => router.push("/stats")}
-              className="gap-2"
+              className="gap-2 text-sm"
             >
               <BarChart3 className="size-4" />
               Stats
@@ -70,7 +92,7 @@ function Navbar() {
               variant={isActive("/session") ? "secondary" : "ghost"}
               size="sm"
               onClick={() => router.push("/session")}
-              className="gap-2"
+              className="gap-2 text-sm"
             >
               <Play className="size-4" />
               Nueva sesion
@@ -83,27 +105,12 @@ function Navbar() {
           {/* Badge de XP/Level (solo si esta autenticado) */}
           {token && (
             <div
-              className="hidden sm:flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-1.5"
-              title={`Nv ${stats.level} · ${stats.total_xp} XP · ${stats.xp_to_next_level} XP para Nv ${stats.level + 1}`}
+              className="hidden sm:flex items-center gap-2 rounded-lg border border-border/50 bg-background px-3 py-1.5 text-sm"
+              title={`${stats.total_xp} XP · ${stats.xp_to_next_level} XP para Nv ${stats.level + 1}`}
             >
-              <Star className="size-4 text-amber-500 fill-amber-500" />
-              <div className="flex flex-col leading-none">
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                  Nv {stats.level}
-                </span>
-                <span className="text-xs font-semibold text-foreground">
-                  {stats.total_xp} XP
-                </span>
-              </div>
-              {/* Mini barra de progreso al siguiente nivel */}
-              <div className="hidden lg:block w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                <motion.div
-                  className="h-full bg-amber-500"
-                  initial={false}
-                  animate={{ width: `${progressPct}%` }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                />
-              </div>
+              <Star className="size-3.5 text-amber-500 fill-amber-500" />
+              <span className="font-semibold tabular-nums">Nv {stats.level}</span>
+              <span className="text-muted-foreground tabular-nums">{stats.total_xp} XP</span>
             </div>
           )}
 
@@ -111,8 +118,8 @@ function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 rounded-full outline-none cursor-pointer transition-transform hover:scale-105">
-                  <Avatar size="lg">
-                    <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
+                  <Avatar className="size-8">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
