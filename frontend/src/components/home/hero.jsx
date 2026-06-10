@@ -40,7 +40,7 @@ export default function Hero() {
   }, [mounted])
 
   return (
-    <section className="relative flex flex-col items-center justify-center px-4 sm:px-6 min-h-[calc(100vh-4rem)] bg-white">
+    <section className="relative flex flex-col items-center justify-center px-4 sm:px-6 min-h-screen bg-white">
 
       <DotsGrid />
 
