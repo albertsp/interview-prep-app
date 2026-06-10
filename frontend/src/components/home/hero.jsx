@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, animate } from "framer-motion";
 import { useRouter } from "next/navigation"
-import { ArrowRight } from "lucide-react"
-import DotsGrid from "@/components/DotsGrid"
+import { ArrowRight, Sparkles } from "lucide-react"
 
 const HERO_TEXT = "Prepárate para tu próxima entrevista técnica";
 
@@ -40,15 +39,26 @@ export default function Hero() {
   }, [mounted])
 
   return (
-    <section className="relative flex flex-col items-center justify-center px-4 sm:px-6 min-h-screen bg-white">
-
-      <DotsGrid />
+    <section className="relative flex flex-col items-center justify-center px-4 sm:px-6 min-h-screen bg-white [background-image:linear-gradient(to_right,rgba(0,0,0,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.04)_1px,transparent_1px)] [background-size:64px_64px]">
 
       <div className="relative z-10 flex flex-col items-center text-center">
 
-        <span className="inline-block mb-8 px-5 py-2 rounded-full border border-gray-200 text-gray-400 text-base">
-            ✦ Potenciado por IA
-        </span>
+        <motion.span
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="relative inline-flex items-center gap-1.5 mb-8 px-5 py-2 rounded-full border border-indigo-200/50 bg-gradient-to-r from-indigo-50/80 via-white to-purple-50/80 text-indigo-500 text-base font-medium shadow-sm shadow-indigo-200/20 overflow-hidden"
+        >
+          <span className="relative z-10 flex items-center gap-1.5">
+            <Sparkles className="size-3.5" />
+            Potenciado por IA
+          </span>
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent"
+            animate={{ x: ["-100%", "200%"] }}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut", repeatDelay: 4 }}
+          />
+        </motion.span>
 
       <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] mb-6 max-w-5xl">
         {mounted ? displayedText : HERO_TEXT}
