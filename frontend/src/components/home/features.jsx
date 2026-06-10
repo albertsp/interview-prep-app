@@ -1,3 +1,7 @@
+"use client"
+
+import { motion } from "framer-motion"
+
 const FEATURES = [
   {
     icon: "👤",
@@ -23,10 +27,16 @@ const FEATURES = [
 
 export default function Features() {
   return (
-    <section className="w-full px-6 py-24 bg-white">
+    <motion.section
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-200px" }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="w-full px-6 py-16 bg-white"
+    >
 
-      <div className="text-center mb-14">
-        <h2 className="text-4xl font-bold text-gray-900 mb-4">
+      <div className="text-center mb-10">
+        <h2 className="text-4xl font-bold text-gray-900 mb-3">
           Todo lo que necesitas para prepararte
         </h2>
         <p className="text-gray-400 text-lg max-w-md mx-auto">
@@ -38,7 +48,7 @@ export default function Features() {
         {FEATURES.map(({ icon, title, description }) => (
           <div
             key={title}
-            className="rounded-2xl border border-gray-200 p-8 flex flex-col gap-4 hover:border-gray-300 transition-colors"
+            className="rounded-2xl border border-gray-200 p-6 flex flex-col gap-3 hover:border-gray-300 transition-colors"
           >
             <span className="text-3xl">{icon}</span>
             <h3 className="text-lg font-bold text-gray-900">{title}</h3>
@@ -47,6 +57,6 @@ export default function Features() {
         ))}
       </div>
 
-    </section>
+    </motion.section>
   );
 }
