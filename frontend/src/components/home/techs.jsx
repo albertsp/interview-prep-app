@@ -9,14 +9,14 @@ const TECHS = [
 
 export default function Techs() {
   return (
-    <section className="w-full py-20 bg-gray-50">
+    <section className="w-full py-24 bg-gray-50">
 
-       <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">
+       <div className="text-center mb-14">
+        <h2 className="text-4xl font-bold text-gray-900 mb-4">
           Tecnologías disponibles
         </h2>
-        <p className="text-gray-400 text-base max-w-sm mx-auto">
-          Practicá con las tecnologías más demandadas del mercado.
+        <p className="text-gray-400 text-lg max-w-md mx-auto">
+          Practica con las tecnologías más demandadas del mercado.
         </p>
       </div>
 
@@ -24,10 +24,10 @@ export default function Techs() {
         {TECHS.map(({ name, icon }) => (
           <div
             key={name}
-            className="flex flex-col items-center justify-center gap-3 py-8 w-36 rounded-2xl border border-gray-200 bg-white hover:border-gray-300 transition-colors"
+            className="flex flex-col items-center justify-center gap-4 py-10 w-40 rounded-2xl border border-gray-200 bg-white hover:border-gray-300 transition-colors"
           >
-            <span className="text-4xl">{icon}</span>
-            <span className="text-sm font-bold text-gray-900">{name}</span>
+            <span className="text-5xl">{icon}</span>
+            <span className="text-base font-bold text-gray-900">{name}</span>
           </div>
         ))}
       </div>
