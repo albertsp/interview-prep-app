@@ -17,7 +17,6 @@ import { LayoutDashboard, Play, LogOut, LogIn, UserPlus, Star, BarChart3 } from 
 import { useAuth } from "@/context/AuthContext"
 
 const BRAND = "InterviewKit"
-const TAGLINE = "Prepárate para tu próxima entrevista técnica"
 
 function BrandText() {
   const [mounted, setMounted] = useState(false)
@@ -27,40 +26,25 @@ function BrandText() {
   }, [])
 
   if (!mounted) {
-    return (
-      <div className="flex flex-col">
-        <span className="text-2xl font-bold tracking-tight leading-none">{BRAND}</span>
-        <span className="text-[11px] text-muted-foreground leading-none mt-1">{TAGLINE}</span>
-      </div>
-    )
+    return <span className="text-3xl font-bold tracking-tight">{BRAND}</span>
   }
 
   const chars = BRAND.split("")
 
   return (
-    <div className="flex flex-col">
-      <span className="text-2xl font-bold tracking-tight leading-none">
-        {chars.map((char, i) => (
-          <motion.span
-            key={i}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.03, duration: 0.3, ease: "easeOut" }}
-            className="inline-block"
-          >
-            {char}
-          </motion.span>
-        ))}
-      </span>
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: chars.length * 0.03 + 0.2, duration: 0.5 }}
-        className="text-[11px] text-muted-foreground leading-none mt-1"
-      >
-        {TAGLINE}
-      </motion.span>
-    </div>
+    <span className="text-3xl font-bold tracking-tight">
+      {chars.map((char, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.03, duration: 0.3, ease: "easeOut" }}
+          className="inline-block"
+        >
+          {char}
+        </motion.span>
+      ))}
+    </span>
   )
 }
 
