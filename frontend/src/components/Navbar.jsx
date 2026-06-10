@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -19,33 +18,7 @@ import { useAuth } from "@/context/AuthContext"
 const BRAND = "InterviewKit"
 
 function BrandText() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return <span className="text-3xl font-bold tracking-tight">{BRAND}</span>
-  }
-
-  const chars = BRAND.split("")
-
-  return (
-    <span className="text-3xl font-bold tracking-tight">
-      {chars.map((char, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.03, duration: 0.3, ease: "easeOut" }}
-          className="inline-block"
-        >
-          {char}
-        </motion.span>
-      ))}
-    </span>
-  )
+  return <span className="text-3xl font-bold tracking-tight">{BRAND}</span>
 }
 
 function Navbar() {
@@ -57,12 +30,13 @@ function Navbar() {
   const isActive = (path) => pathname === path
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
+    <header className="fixed top-0 inset-x-0 z-50 flex justify-center pt-4 pointer-events-none">
+      <div className="pointer-events-auto flex w-[calc(100%-2rem)] max-w-5xl items-center justify-between px-6 py-3 rounded-2xl bg-background/70 backdrop-blur-xl border border-border/30 shadow-lg shadow-black/5">
+
         {/* Brand */}
         <motion.button
           onClick={() => router.push("/")}
-          className="outline-none cursor-pointer select-none"
+          className="outline-none cursor-pointer select-none shrink-0"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -103,7 +77,7 @@ function Navbar() {
         )}
 
         {/* Avatar + dropdown o botones de auth */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           {/* Badge de XP/Level (solo si esta autenticado) */}
           {token && (
             <div
@@ -167,6 +141,7 @@ function Navbar() {
             </>
           )}
         </div>
+
       </div>
     </header>
   )
