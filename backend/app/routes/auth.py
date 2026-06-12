@@ -64,6 +64,6 @@ def login():
         return jsonify({"error": "Credenciales incorrectas"}), 400
     
     # Creamos un acces token
-    expires = current_app.config["JWT_ACCESS_TOKEN_EXPIRES"]
-    access_token = create_access_token(identity=str(user.user_id), expires=expires)
+    expires_delta = current_app.config["JWT_ACCESS_TOKEN_EXPIRES"]
+    access_token = create_access_token(identity=str(user.user_id), expires_delta=expires_delta)
     return jsonify(access_token=access_token, user_id =user.user_id, name = user.name), 200
