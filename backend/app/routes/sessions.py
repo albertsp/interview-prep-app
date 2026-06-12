@@ -1,6 +1,10 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from ..constants.stacks import VALID_LEVELS, VALID_STACKS
+from ..constants.gamification import (
+    XP_PER_LEVEL, XP_PER_RESULT, XP_COMPLETION_BONUS,
+    compute_level, xp_to_next_level,
+)
 from ..models.session import Session
 from ..models.question import Question
 from ..models.user import User
@@ -8,27 +12,6 @@ from .. import db
 from ..services.ai_service import generate_questions, generate_feedback
 
 sessions = Blueprint('sessions', __name__, url_prefix='/sessions')
-
-# --- Gamificación: configuración de XP ---
-XP_PER_RESULT = {
-    "CORRECT": 100,
-    "PARTIALLY_CORRECT": 50,
-    "INCORRECT": 10,
-}
-XP_COMPLETION_BONUS = 50
-XP_PER_LEVEL = 500
-
-
-def compute_level(total_xp):
-    """Nivel = floor(total_xp / XP_PER_LEVEL) + 1. Nivel 1 desde 0 XP."""
-    return (total_xp // XP_PER_LEVEL) + 1
-
-
-def xp_to_next_level(total_xp):
-    """XP que faltan para subir al siguiente nivel."""
-    current_level = compute_level(total_xp)
-    next_level_threshold = current_level * XP_PER_LEVEL
-    return max(0, next_level_threshold - total_xp)
 
 
 @sessions.route('/', methods=['POST'])
@@ -55,6 +38,11 @@ def create_session():
 
     # Generamos preguntas
     questions = generate_questions(stack, level)
+
+    if not isinstance(questions, list) or len(questions) == 0:
+        db.session.delete(new_session)
+        db.session.commit()
+        return jsonify({"error": "No se pudieron generar las preguntas. Intentalo de nuevo."}), 503
 
     # Guardamos cada pregunta como registro Question en BD de la session actual
     for question in questions:

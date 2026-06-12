@@ -112,21 +112,35 @@ def _safe_feedback(data):
     }
 
 
+FALLBACK_QUESTIONS = [
+    "Explica con un ejemplo cómo funcionan las closures en el contexto del stack seleccionado.",
+    "Escribe una función que recorra un array y devuelva un nuevo array transformado.",
+    "Describe el patrón más común para manejar errores asíncronos en este stack.",
+    "¿Cuál es la diferencia entre copia superficial (shallow copy) y copia profunda (deep copy)? Muestra un ejemplo.",
+    "Escribe una función que haga una petición HTTP y maneje correctamente los errores de red.",
+]
+
+
 def generate_questions(stack, level):
-    chat_completion = client.chat.completions.create(
-        messages=[
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT_QUESTIONS,
-            },
-            {
-                "role": "user",
-                "content": f"Generate 5 interview questions for {stack} at {level} level.",
-            }
-        ],
-        model="llama-3.3-70b-versatile"
-    )
-    return _parse_ai_json(chat_completion.choices[0].message.content)
+    """Genera 5 preguntas via IA. Devuelve una lista. Nunca lanza excepcion."""
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": SYSTEM_PROMPT_QUESTIONS,
+                },
+                {
+                    "role": "user",
+                    "content": f"Generate 5 interview questions for {stack} at {level} level.",
+                }
+            ],
+            model="llama-3.3-70b-versatile"
+        )
+        raw = chat_completion.choices[0].message.content
+        return _parse_ai_json(raw)
+    except Exception:
+        return list(FALLBACK_QUESTIONS)
 
 
 def generate_feedback(stack, question, answer):
