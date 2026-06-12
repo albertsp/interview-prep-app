@@ -1,29 +1,41 @@
-from flask import Blueprint, request, jsonify
+import re
+
+from flask import Blueprint, request, jsonify, current_app
 from ..models.user import User
 import bcrypt
 from .. import db
 from flask_jwt_extended import create_access_token
 
 
-auth = Blueprint('auth', __name__,url_prefix='/auth')
+EMAIL_REGEX = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+MIN_PASSWORD_LENGTH = 8
+
+auth = Blueprint('auth', __name__, url_prefix='/auth')
+
 
 @auth.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
- 
-    #Validamos que no haya campos vacios
-    if data.get("name") is None or data.get("email") is None or data.get("password") is None:
+
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip()
+    password = data.get("password") or ""
+
+    if not name or not email or not password:
         return jsonify({"error": "Los campos no pueden estar vacios"}), 400
-  
-    # Validamos que el email no este registrado en la BD
-    if User.query.filter_by(email=data.get("email")).first() is not None:
+
+    if not re.match(EMAIL_REGEX, email):
+        return jsonify({"error": "El formato del email no es valido"}), 400
+
+    if len(password) < MIN_PASSWORD_LENGTH:
+        return jsonify({"error": f"La contrasena debe tener al menos {MIN_PASSWORD_LENGTH} caracteres"}), 400
+
+    if User.query.filter_by(email=email).first() is not None:
         return jsonify({"error": "Este email ya esta registrado"}), 409
 
-    # Extraemos el password, hacemos encode y hasheamos y hacemos decode
-    hashedPassword = bcrypt.hashpw(data.get("password").encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
+    hashedPassword = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(12)).decode("utf-8")
 
-    #Creamos usuario y guardamos en BD
-    new_user = User(name=data.get("name"),email=data.get("email"),password=hashedPassword)
+    new_user = User(name=name, email=email, password=hashedPassword)
     db.session.add(new_user)
     db.session.commit()
 
