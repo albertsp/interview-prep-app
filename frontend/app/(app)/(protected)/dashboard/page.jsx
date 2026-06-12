@@ -70,7 +70,7 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="min-h-screen bg-slate-50 px-6 py-12 md:py-20">
+    <div className="min-h-screen bg-slate-50 px-6 py-12 md:py-20 m-20">
       {/* Todo el contenido ahora comparte el mismo ancho máximo centrado */}
       <div className="max-w-6xl mx-auto">
 

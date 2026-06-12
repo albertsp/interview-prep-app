@@ -61,7 +61,7 @@ export default function StatsPage() {
       : 0;
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] px-4 py-10">
+    <div className="min-h-[calc(100vh-4rem)] px-4 py-10 m-20">
       <motion.div
         className="max-w-4xl mx-auto space-y-6"
         variants={containerVariants}
