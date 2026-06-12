@@ -38,3 +38,17 @@ class Card(db.Model):
     difficulty = db.Column(db.Integer(), nullable=True)
     # Fecha de creacion de la card
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def serialize(self):
+        return{
+            "card_id": self.card_id,
+            "question_id": self.question_id,
+            "session_id": self.session_id,
+            "user_id": self.user_id,
+            "concept": self.concept,
+            "explanation": self.explanation,
+            "use_case": self.use_case,
+            "code": self.code,
+            "code_language": self.code_language,
+            "created_at": self.created_at.isoformat()
+        }

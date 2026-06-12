@@ -8,6 +8,32 @@ from .. import db
 # Blueprint para las rutas de cards
 cards = Blueprint('cards', __name__, url_prefix='/cards')
 
+@cards.route('/', methods=['GET'])
+@jwt_required()
+def get_cards():
+    user = get_jwt_identity()
+    cards = Card.query.filter_by(user_id=user).all()
+
+    response = [card.serialize() for card in cards]
+
+    return jsonify(response), 200
+
+@cards.route('/<int:card_id>', methods=['DELETE'])
+@jwt_required()
+def delete_card(card_id):
+    user = get_jwt_identity()
+    
+    card_to_delete = Card.query.filter_by(
+        card_id=card_id, user_id=user
+    ).first()
+
+    if card_to_delete is None:
+        return jsonify({"msg": "la card no existe"}), 404
+
+    db.session.delete(card_to_delete)
+    db.session.commit()
+
+    return jsonify( {"msg": "Card Eliminada Exitosamente"}), 200
 
 # Mapeo de nivel textual a dificultad numerica
 LEVEL_TO_DIFFICULTY = {
