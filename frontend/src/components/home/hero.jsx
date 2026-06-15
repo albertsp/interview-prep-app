@@ -72,8 +72,8 @@ export default function Hero() {
           />
         </motion.span>
 
-      <h1 ref={textRef} className="text-4xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] mb-6 max-w-5xl">
-        {HERO_TEXT}
+      <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] mb-6 max-w-5xl">
+        <span ref={textRef}>{HERO_TEXT}</span>
         {isTyping && (
           <motion.span
             animate={{ opacity: [1, 0, 1] }}
