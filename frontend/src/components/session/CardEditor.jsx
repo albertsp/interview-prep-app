@@ -81,7 +81,7 @@ function TagChips({ tags, onTagClick }) {
 }
 
 // Vista de lectura: muestra la card formateada y bonita
-function CardView({ card, wasEdited }) {
+export function CardView({ card, wasEdited }) {
   return (
     <div className="space-y-5">
       {/* Titulo: concepto + definicion */}
@@ -166,6 +166,8 @@ function CardView({ card, wasEdited }) {
 
 // Vista de edicion: todos los campos editables
 function CardEdit({ card, onChange }) {
+  if (!card) return null;
+
   const updateField = (field, value) => {
     onChange({ ...card, [field]: value });
   };

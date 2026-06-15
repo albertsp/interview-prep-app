@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import MarkdownContent from "@/components/MarkdownContent";
 import CardEditor from "@/components/session/CardEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfirmEdit } from "@/components/dashboard/confirmEdit";
 import {
   Trash2,
   Save,
@@ -74,6 +76,8 @@ export default function FeedbackPhase({
   onSave,
   originalCard,
 }) {
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
   return (
     <motion.div
       key="waiting_action"
@@ -123,11 +127,13 @@ export default function FeedbackPhase({
           <Trash2 className="size-5" />
           Descartar
         </Button>
-        <Button onClick={onSave} size="lg" className="gap-2">
+        <Button onClick={() => setIsConfirmOpen(true)} size="lg" className="gap-2">
           <Save className="size-5" />
           Guardar card
         </Button>
       </div>
+
+      <ConfirmEdit isConfirmOpen={isConfirmOpen} setIsConfirmOpen={setIsConfirmOpen} onSave={onSave} />
     </motion.div>
   );
 }
