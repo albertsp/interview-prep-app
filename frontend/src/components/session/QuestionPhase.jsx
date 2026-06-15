@@ -104,7 +104,7 @@ export default function QuestionPhase({
           onClick={onSubmit}
           disabled={!answer.trim()}
           size="lg"
-          className="gap-2 px-10 text-base"
+          className="gap-2 px-6 sm:px-10 text-base w-full sm:w-auto"
         >
           Enviar respuesta
           <Send className="size-5" />

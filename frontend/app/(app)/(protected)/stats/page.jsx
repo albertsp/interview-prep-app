@@ -42,7 +42,7 @@ export default function StatsPage() {
       };
 
   return (
-    <div className="px-4 sm:px-6 py-10">
+    <div className="px-4 sm:px-6 pt-24 pb-10">
       <motion.div
         className="max-w-5xl mx-auto space-y-6"
         variants={containerVariants}
