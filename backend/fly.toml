@@ -1,0 +1,19 @@
+app = "interview-prep-api"
+
+[build]
+
+[env]
+  FLASK_APP = "app:create_app()"
+
+[deploy]
+  release_command = "flask db upgrade"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  size = "shared-cpu-1x"

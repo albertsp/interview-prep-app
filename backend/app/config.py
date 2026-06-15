@@ -1,16 +1,26 @@
 import os
 from datetime import timedelta
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
-load_dotenv()
+load_dotenv(find_dotenv(usecwd=True))
+
+
+def _get_database_url():
+    url = os.getenv("DATABASE_URL")
+    if url and url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    return url
+
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = _get_database_url()
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(
         hours=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_HOURS", "1"))
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
     # Orígenes permitidos por CORS, separados por comas.
     # Ejemplo dev: "http://localhost:3000"

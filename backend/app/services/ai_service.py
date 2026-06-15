@@ -170,5 +170,3 @@ def generate_feedback(stack, question, answer):
         return dict(EMPTY_FEEDBACK)
 
 
-if __name__ == "_main__":
-    generate_questions("JavaScript", "Basico")
