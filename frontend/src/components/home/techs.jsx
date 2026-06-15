@@ -16,14 +16,14 @@ const duplicated = [...TECHS, ...TECHS]
 
 export default function Techs() {
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-200px" }}
+<motion.section
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="w-full py-16 bg-gray-50 overflow-hidden"
     >
-
+ 
       <div className="text-center mb-10">
         <h2 className="text-4xl font-bold text-gray-900 mb-3">
           Tecnologías disponibles
