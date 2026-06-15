@@ -1,42 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { Trophy, Star, TrendingUp, Sparkles } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { MOCK_STATS } from "@/data/mockStats";
+import LevelHero from "@/components/stats/LevelHero";
+import StatCards from "@/components/stats/StatCards";
+import RecentSessions from "@/components/stats/RecentSessions";
+import SavedCardsSummary from "@/components/stats/SavedCardsSummary";
 
-// Configuracion central de las 3 stat cards: icono, color, label y como
-// derivar el valor numerico desde el objeto `stats`. Mantenerlo como data
-// (no como JSX) permite reordenar o anadir cards en un solo lugar.
-const STAT_CARDS = [
-  {
-    key: "level",
-    label: "Tu nivel",
-    icon: Trophy,
-    iconClass: "text-amber-500",
-    value: (s) => s.level,
-  },
-  {
-    key: "total_xp",
-    label: "XP total",
-    icon: Star,
-    iconClass: "text-amber-500 fill-amber-500",
-    // toLocaleString formatea con separador de miles segun idioma (1.250)
-    value: (s) => s.total_xp.toLocaleString("es-ES"),
-  },
-  {
-    key: "xp_to_next",
-    label: "Al siguiente nivel",
-    icon: TrendingUp,
-    iconClass: "text-emerald-500",
-    value: (s) => s.xp_to_next_level.toLocaleString("es-ES"),
-  },
-];
+const ResultsDonut = dynamic(() => import("@/components/stats/ResultsDonut"), { ssr: false });
+const StackBars = dynamic(() => import("@/components/stats/StackBars"), { ssr: false });
 
-// Variants reutilizables: el contenedor orquesta la cascada y los hijos
-// comparten las mismas keys ("hidden" / "visible") para entrar escalonados
-// sin necesidad de pasar delays manuales a cada uno.
+const USE_MOCK = true;
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -53,106 +30,56 @@ const itemVariants = {
 export default function StatsPage() {
   const { stats } = useAuth();
 
-  // Progreso hacia el siguiente nivel en porcentaje (0-100).
-  // La guardia evita division por cero si xp_per_level viniera vacio.
-  const progressPct =
-    stats.xp_per_level > 0
-      ? Math.min(100, (stats.progress_in_level / stats.xp_per_level) * 100)
-      : 0;
+  const data = USE_MOCK
+    ? { ...stats, ...MOCK_STATS }
+    : {
+        ...stats,
+        results_summary: { correct: 0, partially_correct: 0, incorrect: 0 },
+        stacks_stats: [],
+        sessions_count: 0,
+        recent_sessions: [],
+        cards_summary: { total: 0, top_tags: [] },
+      };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] px-4 py-10 m-20">
+    <div className="px-4 sm:px-6 py-10">
       <motion.div
-        className="max-w-4xl mx-auto space-y-6"
+        className="max-w-5xl mx-auto space-y-6"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* HERO: nivel grande + barra de progreso al siguiente nivel.
-            El borde y fondo ambar conectan visualmente con el badge XP del navbar. */}
         <motion.div variants={itemVariants}>
-          <Card className="border-2 border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-orange-500/5 overflow-hidden">
-            <CardContent className="p-8 md:p-10 flex flex-col items-center text-center">
-              <span className="text-xs uppercase tracking-widest text-muted-foreground font-semibold mb-3">
-                Tu nivel actual
-              </span>
-
-              {/* Numero grande con texto-gradiente: truco CSS para colorear
-                  solo el contorno del texto, no el fondo */}
-              <div className="text-7xl font-bold tracking-tight bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-                {stats.level}
-              </div>
-              <span className="text-sm text-muted-foreground mt-1">Nivel</span>
-
-              {/* Barra de progreso: animamos width de 0 al valor real
-                  para que "se rellene" al cargar la pagina */}
-              <div className="w-full max-w-md mt-6">
-                <div className="h-3 w-full rounded-full bg-amber-500/20 overflow-hidden">
-                  <motion.div
-                    className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progressPct}%` }}
-                    transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
-                  />
-                </div>
-                <div className="flex justify-between mt-2 text-xs text-muted-foreground font-medium">
-                  <span>
-                    {stats.progress_in_level} / {stats.xp_per_level} XP
-                  </span>
-                  <span>
-                    {stats.xp_to_next_level} XP al Nv {stats.level + 1}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <LevelHero
+            level={data.level}
+            progressInLevel={data.progress_in_level}
+            xpPerLevel={data.xp_per_level}
+            xpToNextLevel={data.xp_to_next_level}
+          />
         </motion.div>
 
-        {/* GRID: 3 stat cards. Stagger heredado del contenedor + hover sutil
-            via whileHover (scale + lift) usando spring para feeling natural. */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {STAT_CARDS.map((card) => {
-            const Icon = card.icon;
-            return (
-              <motion.div
-                key={card.key}
-                variants={itemVariants}
-                whileHover={{ scale: 1.02, y: -2 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              >
-                <Card className="h-full">
-                  <CardContent className="p-6 flex flex-col items-center text-center gap-2">
-                    <Icon className={cn("size-6", card.iconClass)} />
-                    <span className="text-3xl font-bold tracking-tight">
-                      {card.value(stats)}
-                    </span>
-                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                      {card.label}
-                    </span>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            );
-          })}
+        <motion.div variants={itemVariants}>
+          <StatCards stats={stats} sessionsCount={data.sessions_count} />
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <motion.div variants={itemVariants}>
+            <ResultsDonut results={data.results_summary} />
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <StackBars stacks={data.stacks_stats} />
+          </motion.div>
         </div>
 
-        {/* TEASER: roadmap de fases 1-3. El borde punteado indica
-            "contenido en construccion" sin parecer roto. */}
         <motion.div variants={itemVariants}>
-          <Card className="border-dashed">
-            <CardContent className="p-6 md:p-8 flex flex-col items-center text-center gap-3">
-              <Sparkles className="size-5 text-muted-foreground" />
-              <h3 className="text-base font-semibold">Próximamente</h3>
-              <p className="text-sm text-muted-foreground max-w-sm">
-                Estamos preparando más estadísticas para ti:
-              </p>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>Distribución por stack (JavaScript, Python, ...)</li>
-                <li>Tendencia temporal de XP</li>
-                <li>Sesiones completadas y cards guardadas</li>
-              </ul>
-            </CardContent>
-          </Card>
+          <RecentSessions sessions={data.recent_sessions} />
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <SavedCardsSummary
+            total={data.cards_summary.total}
+            topTags={data.cards_summary.top_tags}
+          />
         </motion.div>
       </motion.div>
     </div>

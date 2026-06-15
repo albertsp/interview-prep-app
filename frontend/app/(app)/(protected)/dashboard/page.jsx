@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InputGroupDemo } from "@/components/dashboard/barrabusqueda";
 import { ToggleGroupDemo } from "@/components/dashboard/botonesFiltro";
+import { SingleCard } from "@/components/dashboard/singleCard";
 
 export default function DashboardPage() {
 
@@ -39,17 +40,27 @@ export default function DashboardPage() {
 
   const [searchInput, setSearchInput] = useState("")
   const [languageFilter, setLanguageFilter] = useState("")
+  const [orderSort, setOrderSort] = useState("desc")
 
   //Convinacion de Filtros
-  const filtered_cards = cards.filter((card) => {
-    const matchesSearch = card.concept.toLowerCase().includes(searchInput.toLowerCase())
-    const matchesLanguage = languageFilter === "" ? true : card.code_language === languageFilter
+  const filtered_cards = cards
+    .filter((card) => {
+      const matchesSearch = (card.concept ?? "").toLowerCase().includes(searchInput.toLowerCase())
+      const matchesLanguage = languageFilter === "" ? true : card.code_language === languageFilter
 
-    return matchesSearch && matchesLanguage
+    return matchesSearch && matchesLanguage 
 
+    })
+  .sort((a, b) => {
+    
+    if (orderSort === "asc"){
+      return new Date(a.created_at) - new Date(b.created_at)
+    } else {
+      return new Date(b.created_at) - new Date(a.created_at)
+    }
   })
 
-  // Eliminar una Card
+  // Eliminar una Card 
   const deleteCard = async (card_id) => {
     const response = await fetch(`${API_URL}/cards/${card_id}`, {
       method: 'DELETE',
@@ -59,6 +70,8 @@ export default function DashboardPage() {
       }
     });
     if (response.ok) {
+      setIsSingleCardOpen(false)
+      setSelectedCard(null)
       getCards()
       const data = await response.json();
       return data;
@@ -68,6 +81,38 @@ export default function DashboardPage() {
     };
   }
 
+  //abrir una sola card
+  const [selectedCard, setSelectedCard] = useState(null)
+  const [originalCard, setOriginalCard] = useState(null)
+  const [isSingleCardOpen, setIsSingleCardOpen] = useState(null)
+
+  const abrirCard = (card) => {
+    setIsSingleCardOpen(true)
+    setSelectedCard(card)
+    setOriginalCard({ ...card })
+  }
+
+  const handleCardChange = (updatedCard) => {
+    setSelectedCard(updatedCard)
+  }
+
+  const saveCard = async () => {
+    if (!selectedCard) return
+    const response = await fetch(`${API_URL}/cards/${selectedCard.card_id}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(selectedCard)
+    })
+    if (response.ok) {
+      setIsSingleCardOpen(false)
+      setSelectedCard(null)
+      setOriginalCard(null)
+      getCards()
+    }
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 px-6 py-12 md:py-20 m-20">
@@ -77,16 +122,15 @@ export default function DashboardPage() {
         {/* Contenedor para los buscadores y filtros con separación */}
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-center mb-10">
           <InputGroupDemo setSearchInput={setSearchInput} />
-          <ToggleGroupDemo setLanguageFilter={setLanguageFilter} />
+          <ToggleGroupDemo setLanguageFilter={setLanguageFilter} setOrderSort={setOrderSort} />
         </div>
-
-        <h1 className="text-3xl font-bold text-slate-800 text-center mb-10">
-          Mis Cards
-        </h1>
-
+        
         {/* Contenedor Grid adaptable a pantallas móviles, tablets y escritorio */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <SingleCard isSingleCardOpen={isSingleCardOpen} setIsSingleCardOpen={setIsSingleCardOpen} selectedCard={selectedCard} originalCard={originalCard} onCardChange={handleCardChange} onSave={saveCard} deleteCard={deleteCard}/>
+          
           {filtered_cards.map((card) => {
+            
             return (
               <div
                 key={card.card_id}
@@ -136,19 +180,10 @@ export default function DashboardPage() {
                 </div>
                
                 <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
-                  
-                  <Button
-                    variant="destructive"
-                    className="text-xs font-medium px-3 py-1.5 h-auto bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 shadow-none"
-                    onClick={() => { deleteCard(card.card_id) }}
-                  >
-                    Eliminar
-                  </Button>
-
                   <Button
                     variant="outline"
                     className="text-xs font-medium px-3 py-1.5 h-auto bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 border border-green-200 shadow-none flex items-center gap-1.5"
-                    onClick={() => {}}
+                    onClick={() => {abrirCard(card)}}
                   >
                     Abrir
                     <ArrowRight className="w-3.5 h-3.5" />

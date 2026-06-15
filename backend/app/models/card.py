@@ -46,8 +46,11 @@ class Card(db.Model):
             "session_id": self.session_id,
             "user_id": self.user_id,
             "concept": self.concept,
+            "definition": self.definition,
             "explanation": self.explanation,
             "use_case": self.use_case,
+            "avoid_when": self.avoid_when,
+            "mnemonic": self.mnemonic,
             "code": self.code,
             "code_language": self.code_language,
             "created_at": self.created_at.isoformat()
