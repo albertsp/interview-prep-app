@@ -12,7 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import { LayoutDashboard, Play, LogOut, LogIn, UserPlus, Star, BarChart3 } from "lucide-react"
+import { LayoutDashboard, Play, LogOut, LogIn, UserPlus, Star, BarChart3, User } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
 const BRAND = "InterviewKit"
@@ -117,6 +117,10 @@ function Navbar() {
                 <DropdownMenuItem onClick={() => router.push("/session")}>
                   <Play className="mr-2 size-4" />
                   Nueva sesion
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/profile")}>
+                  <User className="mr-2 size-4" />
+                  Perfil
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
