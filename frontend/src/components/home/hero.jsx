@@ -103,7 +103,7 @@ export default function Hero() {
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => router.push("/register")}
-          className="group inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-gray-900 text-white text-lg font-medium shadow-lg shadow-gray-900/10 hover:shadow-xl hover:shadow-gray-900/20 transition-shadow cursor-pointer"
+          className="group inline-flex items-center gap-3 px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl bg-gray-900 text-white text-base sm:text-lg font-medium shadow-lg shadow-gray-900/10 hover:shadow-xl hover:shadow-gray-900/20 transition-shadow cursor-pointer"
         >
           <span>Empezar ahora</span>
           <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-1" />

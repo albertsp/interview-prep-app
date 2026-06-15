@@ -7,44 +7,41 @@ import {
 // Añadimos setOrderSort a las props para que controle el ordenamiento
 export function ToggleGroupDemo({ setLanguageFilter, setOrderSort }) {
   return (
-    <div className="flex flex-wrap gap-4 items-center">
+    <div className="flex flex-wrap gap-3 sm:gap-4 items-center">
       
-      {/* Grupo de Filtro de Lenguaje */}
-      <ToggleGroup variant="outline" type="single" onValueChange={setLanguageFilter}>
-        <ToggleGroupItem value="html" aria-label="Filtrar por HTML">
-          <Code2 className="size-4 mr-2" />
+      <ToggleGroup variant="outline" type="single" onValueChange={setLanguageFilter} className="flex-wrap">
+        <ToggleGroupItem value="html" aria-label="Filtrar por HTML" className="text-xs">
+          <Code2 className="size-3.5 mr-1.5" />
           HTML
         </ToggleGroupItem>
-        <ToggleGroupItem value="javascript" aria-label="Filtrar por JavaScript">
-          <Code2 className="size-4 mr-2" />
-          JAVASCRIPT
+        <ToggleGroupItem value="javascript" aria-label="Filtrar por JavaScript" className="text-xs">
+          <Code2 className="size-3.5 mr-1.5" />
+          JS
         </ToggleGroupItem>
-        <ToggleGroupItem value="python" aria-label="Filtrar por Python">
-          <Code2 className="size-4 mr-2" />
-          PYTHON
+        <ToggleGroupItem value="python" aria-label="Filtrar por Python" className="text-xs">
+          <Code2 className="size-3.5 mr-1.5" />
+          PY
         </ToggleGroupItem>
-        <ToggleGroupItem value="sql" aria-label="Filtrar por SQL">
-          <Code2 className="size-4 mr-2" />
+        <ToggleGroupItem value="sql" aria-label="Filtrar por SQL" className="text-xs">
+          <Code2 className="size-3.5 mr-1.5" />
           SQL
         </ToggleGroupItem>
-        <ToggleGroupItem value="react" aria-label="Filtrar por React">
-          <Code2 className="size-4 mr-2" />
+        <ToggleGroupItem value="react" aria-label="Filtrar por React" className="text-xs">
+          <Code2 className="size-3.5 mr-1.5" />
           REACT
         </ToggleGroupItem>
-        <ToggleGroupItem value="" aria-label="Limpiar filtro">
-          <X className="size-4 mr-2" />
+        <ToggleGroupItem value="" aria-label="Limpiar filtro" className="text-xs">
+          <X className="size-3.5 mr-1.5" />
           Reset
         </ToggleGroupItem>
       </ToggleGroup>
 
-      {/* Nuevo Grupo de Ordenamiento */}
       <ToggleGroup variant="outline" type="single" defaultValue="desc" onValueChange={setOrderSort}>
         <ToggleGroupItem value="asc" aria-label="Ordenar de más antiguo a más reciente">
-          <ArrowUpAZ className="size-4 mr-2" />          
+          <ArrowUpAZ className="size-4 mr-1.5" />          
         </ToggleGroupItem>
         <ToggleGroupItem value="desc" aria-label="Ordenar de más reciente a más antiguo">
-          <ArrowDownZA className="size-4 mr-2" />
-          
+          <ArrowDownZA className="size-4 mr-1.5" />
         </ToggleGroupItem>
       </ToggleGroup>
 

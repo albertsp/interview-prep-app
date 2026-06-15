@@ -31,10 +31,10 @@ export default function HowItWorks() {
     >
 
       <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold text-gray-900 mb-3">
+        <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3">
           Cómo funciona
         </h2>
-        <p className="text-gray-400 text-lg max-w-md mx-auto">
+        <p className="text-gray-400 text-base sm:text-lg max-w-md mx-auto">
           Tres pasos para prepararte para tu próxima entrevista.
         </p>
       </div>
