@@ -18,6 +18,56 @@ def get_cards():
 
     return jsonify(response), 200
 
+@cards.route('/<int:card_id>', methods=['PATCH'])
+@jwt_required()
+def update_card(card_id):
+    user = get_jwt_identity()
+
+    card = Card.query.filter_by(
+        card_id=card_id, user_id=user
+    ).first()
+
+    if card is None:
+        return jsonify({"msg": "La card no existe"}), 404
+
+    data = request.get_json() or {}
+
+    concept = (data.get("concept") or "").strip()
+    if concept:
+        card.concept = concept[:120]
+
+    definition = (data.get("definition") or "").strip()
+    card.definition = definition or None
+
+    explanation = (data.get("explanation") or "").strip()
+    if explanation:
+        card.explanation = explanation
+
+    use_case = (data.get("use_case") or "").strip()
+    if use_case:
+        card.use_case = use_case
+
+    avoid_when = (data.get("avoid_when") or "").strip()
+    card.avoid_when = avoid_when or None
+
+    mnemonic = (data.get("mnemonic") or "").strip()
+    card.mnemonic = mnemonic[:200] if mnemonic else None
+
+    if "tags" in data:
+        card.tags = data["tags"] if isinstance(data["tags"], list) else None
+
+    code = (data.get("code") or "").strip()
+    card.code = code or None
+
+    code_language = (data.get("code_language") or "").strip()
+    if code_language:
+        card.code_language = code_language
+
+    db.session.commit()
+
+    return jsonify(card.serialize()), 200
+
+
 @cards.route('/<int:card_id>', methods=['DELETE'])
 @jwt_required()
 def delete_card(card_id):
