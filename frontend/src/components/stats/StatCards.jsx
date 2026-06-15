@@ -40,7 +40,7 @@ export default function StatCards({ stats, sessionsCount }) {
   const extendedStats = { ...stats, sessions_count: sessionsCount };
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {STAT_CARDS.map((card) => {
         const Icon = card.icon;
         return (
@@ -50,9 +50,9 @@ export default function StatCards({ stats, sessionsCount }) {
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
             <Card className="h-full">
-              <CardContent className="p-6 flex flex-col items-center text-center gap-2">
-                <Icon className={cn("size-6", card.iconClass)} />
-                <span className="text-3xl font-bold tracking-tight">
+              <CardContent className="p-4 sm:p-6 flex flex-col items-center text-center gap-1.5 sm:gap-2">
+                <Icon className={cn("size-5 sm:size-6", card.iconClass)} />
+                <span className="text-2xl sm:text-3xl font-bold tracking-tight">
                   {card.value(extendedStats)}
                 </span>
                 <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">

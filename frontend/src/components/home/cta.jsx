@@ -16,11 +16,11 @@ export default function CTA() {
       className="w-full px-6 py-20 bg-white flex flex-col items-center text-center"
     >
 
-      <h2 className="text-4xl font-bold text-gray-900 mb-3 max-w-md">
+      <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 max-w-md">
         ¿Listo para tu próxima entrevista?
       </h2>
 
-      <p className="text-gray-400 text-lg max-w-md mb-8 leading-relaxed">
+      <p className="text-gray-400 text-base sm:text-lg max-w-md mb-8 leading-relaxed">
         Configura tu sesión en segundos y empieza a practicar ahora.
       </p>
 

@@ -117,17 +117,17 @@ export default function FeedbackPhase({
       )}
 
       {/* Botones de accion: descartar o guardar */}
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
         <Button
           variant="outline"
           size="lg"
           onClick={onDiscard}
-          className="gap-2"
+          className="gap-2 w-full sm:w-auto"
         >
           <Trash2 className="size-5" />
           Descartar
         </Button>
-        <Button onClick={() => setIsConfirmOpen(true)} size="lg" className="gap-2">
+        <Button onClick={() => setIsConfirmOpen(true)} size="lg" className="gap-2 w-full sm:w-auto">
           <Save className="size-5" />
           Guardar card
         </Button>

@@ -40,9 +40,9 @@ function StackSelector({ onSubmit, stacks }) {
 
   // Renderiza las tarjetas de opción (rol, tecnología o nivel)
   const renderOptions = (items, type, selectedValue, iconMap) => {
-    const cols = type === "level" ? "grid-cols-3" : "grid-cols-2"
+    const cols = type === "level" ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-2"
     return (
-      <div className={cn("grid gap-4", cols)}>
+      <div className={cn("grid gap-3 sm:gap-4", cols)}>
         {items.map((item) => {
           const selected = selectedValue === item
           const Icon = iconMap?.[item]
@@ -52,18 +52,18 @@ function StackSelector({ onSubmit, stacks }) {
               type="button"
               onClick={() => handleSelect(type, item)}
               className={cn(
-                "relative flex flex-col items-center gap-4 rounded-2xl border-2 p-8 transition-all duration-200",
+                "relative flex flex-col items-center gap-3 sm:gap-4 rounded-2xl border-2 p-5 sm:p-8 transition-all duration-200",
                 "hover:border-primary/50 hover:bg-accent",
                 selected ? "border-primary bg-primary/5 shadow-sm" : "border-border bg-background"
               )}
             >
               {selected && (
-                <span className="absolute top-4 right-4 size-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                  <Check className="size-4" />
+                <span className="absolute top-3 right-3 sm:top-4 sm:right-4 size-5 sm:size-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                  <Check className="size-3 sm:size-4" />
                 </span>
               )}
-              {Icon && <Icon className={cn("size-10 transition-colors", selected ? "text-primary" : "text-muted-foreground")} />}
-              <span className={cn("text-lg font-medium transition-colors", selected && "text-primary")}>
+              {Icon && <Icon className={cn("size-8 sm:size-10 transition-colors", selected ? "text-primary" : "text-muted-foreground")} />}
+              <span className={cn("text-base sm:text-lg font-medium transition-colors", selected && "text-primary")}>
                 {item}
               </span>
             </button>
@@ -84,7 +84,7 @@ function StackSelector({ onSubmit, stacks }) {
             {idx > 0 && (
               <div
                 className={cn(
-                  "w-16 h-1 mx-3 rounded-full transition-colors duration-500",
+                  "w-8 sm:w-16 h-1 mx-2 sm:mx-3 rounded-full transition-colors duration-500",
                   isCompleted(idx - 1) ? "bg-primary" : "bg-border"
                 )}
               />
@@ -98,13 +98,13 @@ function StackSelector({ onSubmit, stacks }) {
             >
               <span
                 className={cn(
-                  "flex items-center justify-center size-14 rounded-full text-lg font-bold transition-all duration-300",
+                  "flex items-center justify-center size-10 sm:size-14 rounded-full text-sm sm:text-lg font-bold transition-all duration-300",
                   isCompleted(idx) && "bg-primary text-primary-foreground",
                   step === idx && !isCompleted(idx) && "bg-primary text-primary-foreground ring-4 ring-primary/20",
                   step !== idx && !isCompleted(idx) && "bg-muted text-muted-foreground"
                 )}
               >
-                {isCompleted(idx) ? <Check className="size-6" /> : idx + 1}
+                {isCompleted(idx) ? <Check className="size-4 sm:size-6" /> : idx + 1}
               </span>
               <span
                 className={cn(
@@ -123,7 +123,7 @@ function StackSelector({ onSubmit, stacks }) {
 
       {/* ---- Card contenedora del paso actual ---- */}
       <Card>
-        <CardContent className="p-8 md:p-10">
+        <CardContent className="p-5 sm:p-8 md:p-10">
           <AnimatePresence mode="wait">
             {/* Paso 1: elegir rol */}
             {step === 0 && (
@@ -184,7 +184,7 @@ function StackSelector({ onSubmit, stacks }) {
 
         {/* ---- Footer: botones Atrás y Empezar ---- */}
         {(step > 0 || select.level) && (
-          <CardFooter className="flex items-center justify-between p-8 md:p-10 pt-0">
+          <CardFooter className="flex items-center justify-between p-5 sm:p-8 md:p-10 pt-0">
             {step > 0 ? (
               <Button variant="ghost" onClick={() => setStep(step - 1)} className="gap-2 text-base">
                 <ChevronLeft className="size-5" />
