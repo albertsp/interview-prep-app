@@ -23,6 +23,7 @@ export default function Hero() {
     if (!mounted) return
 
     setIsTyping(true)
+    if (textRef.current) textRef.current.textContent = ""
     let i = 0
     let lastTime = 0
     let rafId
@@ -73,7 +74,7 @@ export default function Hero() {
         </motion.span>
 
       <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] mb-6 max-w-5xl">
-        <span ref={textRef}>{HERO_TEXT}</span>
+        <span ref={textRef}>{mounted ? "" : HERO_TEXT}</span>
         {isTyping && (
           <motion.span
             animate={{ opacity: [1, 0, 1] }}
