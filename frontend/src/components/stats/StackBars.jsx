@@ -1,0 +1,115 @@
+"use client";
+
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { STACK_COLORS } from "@/data/mockStats";
+import { Layers } from "lucide-react";
+
+const STACK_ICONS = {
+  JavaScript: "JS",
+  React: "Re",
+  Python: "Py",
+  SQL: "SQL",
+  "HTML/CSS": "H/C",
+};
+
+const CUSTOM_TOOLTIP_STYLE = {
+  backgroundColor: "hsl(var(--card))",
+  border: "1px solid hsl(var(--border))",
+  borderRadius: "0.75rem",
+  padding: "0.5rem 0.75rem",
+  fontSize: "0.8125rem",
+  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+};
+
+function CustomTooltip({ active, payload }) {
+  if (!active || !payload || !payload.length) return null;
+  const d = payload[0].payload;
+  return (
+    <div style={CUSTOM_TOOLTIP_STYLE}>
+      <p className="font-medium">{d.stack}</p>
+      <p className="text-muted-foreground">
+        {d.sessions} {d.sessions === 1 ? "sesion" : "sesiones"} · {d.cards} {d.cards === 1 ? "card" : "cards"}
+      </p>
+    </div>
+  );
+}
+
+export default function StackBars({ stacks }) {
+  if (!stacks || stacks.length === 0) {
+    return (
+      <Card className="h-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Layers className="size-5 text-primary" />
+            Distribucion por stack
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center py-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            Aun no tienes sesiones registradas.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const chartData = stacks.map((s) => ({
+    stack: s.stack,
+    sessions: s.sessions,
+    cards: s.cards,
+    icon: STACK_ICONS[s.stack] || s.stack.slice(0, 2).toUpperCase(),
+    fill: STACK_COLORS[s.stack]?.bar || "#6b7280",
+  }));
+
+  return (
+    <Card className="h-full">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Layers className="size-5 text-primary" />
+          Distribucion por stack
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {stacks.map((s) => {
+            const colors = STACK_COLORS[s.stack] || {
+              bg: "bg-gray-500/10",
+              text: "text-gray-700",
+              ring: "ring-gray-500/30",
+            };
+            const icon = STACK_ICONS[s.stack] || s.stack.slice(0, 2).toUpperCase();
+            return (
+              <div key={s.stack} className="flex items-center gap-2 text-sm">
+                <span
+                  className={`inline-flex size-6 shrink-0 items-center justify-center rounded-md text-[10px] font-bold ${colors.bg} ${colors.text} ring-1 ${colors.ring}`}
+                >
+                  {icon}
+                </span>
+                <span className="font-medium w-24 shrink-0">{s.stack}</span>
+                <span className="text-muted-foreground tabular-nums ml-auto">
+                  {s.sessions} {s.sessions === 1 ? "sesion" : "sesiones"} · {s.cards} cards
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 h-[180px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
+              <XAxis type="number" hide />
+              <YAxis type="category" dataKey="icon" width={36} tickLine={false} axisLine={false} tick={{ fontSize: 11, fontWeight: 600 }} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: "hsl(var(--muted))", radius: 4 }} />
+              <Bar dataKey="sessions" radius={[0, 6, 6, 0]} animationBegin={200} animationDuration={600} barSize={24}>
+                {chartData.map((entry) => (
+                  <Cell key={entry.stack} fill={entry.fill} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
