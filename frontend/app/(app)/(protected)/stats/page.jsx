@@ -1,14 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { MOCK_STATS } from "@/data/mockStats";
 import LevelHero from "@/components/stats/LevelHero";
 import StatCards from "@/components/stats/StatCards";
-import ResultsDonut from "@/components/stats/ResultsDonut";
-import StackBars from "@/components/stats/StackBars";
 import RecentSessions from "@/components/stats/RecentSessions";
 import SavedCardsSummary from "@/components/stats/SavedCardsSummary";
+
+const ResultsDonut = dynamic(() => import("@/components/stats/ResultsDonut"), { ssr: false });
+const StackBars = dynamic(() => import("@/components/stats/StackBars"), { ssr: false });
 
 const USE_MOCK = true;
 

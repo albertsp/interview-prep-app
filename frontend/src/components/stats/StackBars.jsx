@@ -100,7 +100,7 @@ export default function StackBars({ stacks }) {
             <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
               <XAxis type="number" hide />
               <YAxis type="category" dataKey="icon" width={36} tickLine={false} axisLine={false} tick={{ fontSize: 11, fontWeight: 600 }} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: "hsl(var(--muted))", radius: 4 }} />
+              <Tooltip content={<CustomTooltip />} wrapperStyle={{ outline: "none" }} cursor={{ fill: "rgba(0,0,0,0.04)", radius: 4 }} />
               <Bar dataKey="sessions" radius={[0, 6, 6, 0]} animationBegin={200} animationDuration={600} barSize={24}>
                 {chartData.map((entry) => (
                   <Cell key={entry.stack} fill={entry.fill} />
