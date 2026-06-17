@@ -12,26 +12,25 @@ import {
   DialogClose
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+import { API_URL, headers, handleResponse } from "@/services/httpClient"
 
 export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, token, profile, setProfile}) {
   const [newName, setNewName] = useState(profile?.name || "")
 
   const handleSave = async () => {
     if (!newName.trim()) return
-    const response = await fetch(`${API_URL}/me/profile`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ name: newName.trim() })
-    })
-    if (response.ok) {
-      const data = await response.json()
-      setProfile({ ...profile, name: data.name })
-      setIsOpenChangeUserName(false)
+    try {
+        const data = await handleResponse(
+            await fetch(`${API_URL}/me/profile`, {
+                method: 'PATCH',
+                headers: headers(token),
+                body: JSON.stringify({ name: newName.trim() })
+            })
+        )
+        setProfile({ ...profile, name: data.name })
+        setIsOpenChangeUserName(false)
+    } catch {
+        // Error handled by handleResponse
     }
   }
 

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Pencil, Mail, Trophy, Star } from 'lucide-react';
 import { useAuth } from "@/context/AuthContext";
+import { API_URL, headers, handleResponse } from "@/services/httpClient";
 
 import {
     Card,
@@ -27,7 +28,6 @@ const itemVariants = {
 
 
 export default function ProfilePage() {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const { token } = useAuth();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -35,18 +35,16 @@ export default function ProfilePage() {
 
     const getProfile = async () => {
         if (!token) return;
-        const response = await fetch(`${API_URL}/me/profile`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                "Content-Type": "application/json"
-            }
-        });
-        if (response.ok) {
-            const data = await response.json();
+        try {
+            const data = await handleResponse(
+                await fetch(`${API_URL}/me/profile`, {
+                    method: 'GET',
+                    headers: headers(token),
+                })
+            );
             setProfile(data);
-        } else {
-            console.log('error: ', response.status, response.statusText);
+        } catch {
+            // Si falla, mantenemos el estado anterior
         }
         setLoading(false);
     }
@@ -150,7 +148,7 @@ export default function ProfilePage() {
                                     <CardContent className="p-6 flex flex-col items-center text-center gap-2">
                                         <Star className="size-6 text-amber-500 fill-amber-500" />
                                         <span className="text-3xl font-bold tracking-tight">
-                                            {profile?.total_xp.toLocaleString("es-ES") || "0"}
+                                            {(profile?.total_xp ?? 0).toLocaleString("es-ES")}
                                         </span>
                                         <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                                             XP Total
