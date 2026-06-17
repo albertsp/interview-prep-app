@@ -36,9 +36,10 @@ function Navbar() {
       { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { path: "/stats", label: "Stats", icon: BarChart3 },
       { path: "/session", label: "Nueva sesion", icon: Play },
-      { path: "/profile", label: "Perfil", icon: User },
     ]
   ) : []
+
+  const profileLink = { path: "/profile", label: "Perfil", icon: User }
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 flex justify-center pt-4 pointer-events-none">
@@ -105,6 +106,10 @@ function Navbar() {
                       {label}
                     </DropdownMenuItem>
                   ))}
+                  <DropdownMenuItem onClick={() => router.push(profileLink.path)}>
+                    <profileLink.icon className="mr-2 size-4" />
+                    {profileLink.label}
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => { logout(); router.push("/") }}
@@ -159,18 +164,27 @@ function Navbar() {
                 <span className="text-xs text-muted-foreground">Nv {stats.level} · {stats.total_xp} XP</span>
               </div>
             </div>
-            {navLinks.map(({ path, label, icon: Icon }) => (
+{navLinks.map(({ path, label, icon: Icon }) => (
+                <button
+                  key={path}
+                  onClick={() => { router.push(path); setMobileMenuOpen(false) }}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer ${
+                    isActive(path) ? "bg-primary/10 text-primary" : "hover:bg-muted text-foreground"
+                  }`}
+                >
+                  <Icon className="size-4" />
+                  {label}
+                </button>
+              ))}
               <button
-                key={path}
-                onClick={() => { router.push(path); setMobileMenuOpen(false) }}
+                onClick={() => { router.push(profileLink.path); setMobileMenuOpen(false) }}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer ${
-                  isActive(path) ? "bg-primary/10 text-primary" : "hover:bg-muted text-foreground"
+                  isActive(profileLink.path) ? "bg-primary/10 text-primary" : "hover:bg-muted text-foreground"
                 }`}
               >
-                <Icon className="size-4" />
-                {label}
+                <profileLink.icon className="size-4" />
+                {profileLink.label}
               </button>
-            ))}
             <button
               onClick={() => { logout(); router.push("/"); setMobileMenuOpen(false) }}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
