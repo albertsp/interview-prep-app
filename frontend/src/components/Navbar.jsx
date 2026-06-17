@@ -1,7 +1,8 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
@@ -12,13 +13,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import { LayoutDashboard, Play, LogOut, LogIn, UserPlus, Star, BarChart3, User } from "lucide-react"
+import { LayoutDashboard, Play, LogOut, LogIn, UserPlus, Star, BarChart3, Menu, X } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
 const BRAND = "InterviewKit"
 
 function BrandText() {
-  return <span className="text-3xl font-bold tracking-tight">{BRAND}</span>
+  return <span className="text-2xl sm:text-3xl font-bold tracking-tight">{BRAND}</span>
 }
 
 function Navbar() {
@@ -26,14 +27,22 @@ function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
   const initials = user ? user.charAt(0).toUpperCase() : "U"
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const isActive = (path) => pathname === path
 
+  const navLinks = token ? (
+    [
+      { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { path: "/stats", label: "Stats", icon: BarChart3 },
+      { path: "/session", label: "Nueva sesion", icon: Play },
+    ]
+  ) : []
+
   return (
     <header className="fixed top-0 inset-x-0 z-50 flex justify-center pt-4 pointer-events-none">
-      <div className="pointer-events-auto flex w-[calc(100%-2rem)] max-w-5xl items-center justify-between px-6 py-3 rounded-2xl bg-background/70 backdrop-blur-xl border border-border/30 shadow-lg shadow-black/5">
+      <div className="pointer-events-auto flex w-[calc(100%-2rem)] max-w-6xl items-center justify-between px-4 sm:px-6 py-3 rounded-2xl bg-background/70 backdrop-blur-xl border border-border/30 shadow-lg shadow-black/5">
 
-        {/* Brand */}
         <motion.button
           onClick={() => router.push("/")}
           className="outline-none cursor-pointer select-none shrink-0"
@@ -43,42 +52,24 @@ function Navbar() {
           <BrandText />
         </motion.button>
 
-        {/* Nav links (solo si esta autenticado) */}
         {token && (
           <nav className="hidden md:flex items-center gap-1">
-            <Button
-              variant={isActive("/dashboard") ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => router.push("/dashboard")}
-              className="gap-2 text-sm"
-            >
-              <LayoutDashboard className="size-4" />
-              Dashboard
-            </Button>
-            <Button
-              variant={isActive("/stats") ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => router.push("/stats")}
-              className="gap-2 text-sm"
-            >
-              <BarChart3 className="size-4" />
-              Stats
-            </Button>
-            <Button
-              variant={isActive("/session") ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => router.push("/session")}
-              className="gap-2 text-sm"
-            >
-              <Play className="size-4" />
-              Nueva sesion
-            </Button>
+            {navLinks.map(({ path, label, icon: Icon }) => (
+              <Button
+                key={path}
+                variant={isActive(path) ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => router.push(path)}
+                className="gap-2 text-sm"
+              >
+                <Icon className="size-4" />
+                {label}
+              </Button>
+            ))}
           </nav>
         )}
 
-        {/* Avatar + dropdown o botones de auth */}
-        <div className="flex items-center gap-3 shrink-0">
-          {/* Badge de XP/Level (solo si esta autenticado) */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {token && (
             <div
               className="hidden sm:flex items-center gap-2 rounded-lg border border-border/50 bg-background px-3 py-1.5 text-sm"
@@ -91,62 +82,104 @@ function Navbar() {
           )}
 
           {token ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-full outline-none cursor-pointer transition-transform hover:scale-105">
-                  <Avatar className="size-8">
-                    <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                  {user || "Usuario"}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push("/dashboard")}>
-                  <LayoutDashboard className="mr-2 size-4" />
-                  Dashboard
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/stats")}>
-                  <BarChart3 className="mr-2 size-4" />
-                  Stats
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/session")}>
-                  <Play className="mr-2 size-4" />
-                  Nueva sesion
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/profile")}>
-                  <User className="mr-2 size-4" />
-                  Perfil
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => { logout(); router.push("/") }}
-                  variant="destructive"
-                >
-                  <LogOut className="mr-2 size-4" />
-                  Cerrar sesion
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="hidden md:flex items-center gap-2 rounded-full outline-none cursor-pointer transition-transform hover:scale-105">
+                    <Avatar className="size-8">
+                      <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                    {user || "Usuario"}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {navLinks.map(({ path, label, icon: Icon }) => (
+                    <DropdownMenuItem key={path} onClick={() => router.push(path)}>
+                      <Icon className="mr-2 size-4" />
+                      {label}
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => { logout(); router.push("/") }}
+                    variant="destructive"
+                  >
+                    <LogOut className="mr-2 size-4" />
+                    Cerrar sesion
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <button
+                className="flex md:hidden items-center justify-center size-9 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+              </button>
+            </>
           ) : (
             <>
-              <Button variant="ghost" size="sm" onClick={() => router.push("/login")} className="gap-2">
+              <Button variant="ghost" size="sm" onClick={() => router.push("/login")} className="gap-1.5 text-xs sm:text-sm sm:gap-2">
                 <LogIn className="size-4" />
-                Iniciar sesion
+                <span className="hidden sm:inline">Iniciar sesion</span>
               </Button>
-              <Button size="sm" onClick={() => router.push("/register")} className="gap-2">
+              <Button size="sm" onClick={() => router.push("/register")} className="gap-1.5 text-xs sm:text-sm sm:gap-2">
                 <UserPlus className="size-4" />
-                Registrarse
+                <span className="hidden sm:inline">Registrarse</span>
               </Button>
             </>
           )}
         </div>
 
       </div>
+
+      <AnimatePresence>
+        {mobileMenuOpen && token && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="fixed top-20 left-4 right-4 z-40 rounded-2xl bg-background/95 backdrop-blur-xl border border-border/30 shadow-lg p-4 flex flex-col gap-2 pointer-events-auto md:hidden"
+          >
+            <div className="flex items-center gap-3 pb-3 border-b border-border/30 mb-1">
+              <Avatar className="size-9">
+                <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium">{user || "Usuario"}</span>
+                <span className="text-xs text-muted-foreground">Nv {stats.level} · {stats.total_xp} XP</span>
+              </div>
+            </div>
+            {navLinks.map(({ path, label, icon: Icon }) => (
+              <button
+                key={path}
+                onClick={() => { router.push(path); setMobileMenuOpen(false) }}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer ${
+                  isActive(path) ? "bg-primary/10 text-primary" : "hover:bg-muted text-foreground"
+                }`}
+              >
+                <Icon className="size-4" />
+                {label}
+              </button>
+            ))}
+            <button
+              onClick={() => { logout(); router.push("/"); setMobileMenuOpen(false) }}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+            >
+              <LogOut className="size-4" />
+              Cerrar sesion
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }

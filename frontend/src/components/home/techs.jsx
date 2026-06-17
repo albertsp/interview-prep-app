@@ -25,29 +25,29 @@ export default function Techs() {
     >
 
       <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold text-gray-900 mb-3">
+        <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3">
           Tecnologías disponibles
         </h2>
-        <p className="text-gray-400 text-lg max-w-md mx-auto">
+        <p className="text-gray-400 text-base sm:text-lg max-w-md mx-auto">
           Practica con las tecnologías más demandadas del mercado.
         </p>
       </div>
 
       <div className="relative max-w-5xl mx-auto overflow-hidden [mask-image:linear-gradient(to_right,transparent_0%,black_10%,black_90%,transparent_100%)]">
         <motion.div
-          className="flex gap-5"
+          className="flex gap-4 sm:gap-5"
           animate={{ x: ["0%", "-50%"] }}
           transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
         >
           {duplicated.map(({ name, Icon, bg, text, ring }, i) => (
             <div
               key={i}
-              className="flex flex-col items-center gap-3 flex-shrink-0 w-36 py-8 rounded-2xl bg-white border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
+              className="flex flex-col items-center gap-2 sm:gap-3 flex-shrink-0 w-28 sm:w-36 py-6 sm:py-8 rounded-2xl bg-white border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
             >
-              <div className={`w-12 h-12 rounded-xl ${bg} ring-1 ${ring} flex items-center justify-center`}>
-                <Icon className={`size-6 ${text}`} strokeWidth={1.5} />
+              <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${bg} ring-1 ${ring} flex items-center justify-center`}>
+                <Icon className={`size-5 sm:size-6 ${text}`} strokeWidth={1.5} />
               </div>
-              <span className="text-sm font-semibold text-gray-700">{name}</span>
+              <span className="text-xs sm:text-sm font-semibold text-gray-700">{name}</span>
             </div>
           ))}
         </motion.div>

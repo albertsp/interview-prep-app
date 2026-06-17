@@ -14,7 +14,7 @@ export default function LevelHero({ level, progressInLevel, xpPerLevel, xpToNext
           Tu nivel actual
         </span>
 
-        <div className="text-7xl font-bold tracking-tight bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+        <div className="text-5xl sm:text-7xl font-bold tracking-tight bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
           {level}
         </div>
         <span className="text-sm text-muted-foreground mt-1">Nivel</span>

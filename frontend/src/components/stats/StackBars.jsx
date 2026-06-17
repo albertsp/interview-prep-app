@@ -86,8 +86,8 @@ export default function StackBars({ stacks }) {
                 >
                   {icon}
                 </span>
-                <span className="font-medium w-24 shrink-0">{s.stack}</span>
-                <span className="text-muted-foreground tabular-nums ml-auto">
+                <span className="font-medium w-20 sm:w-24 shrink-0 text-xs sm:text-sm">{s.stack}</span>
+                <span className="text-muted-foreground tabular-nums ml-auto text-xs sm:text-sm">
                   {s.sessions} {s.sessions === 1 ? "sesion" : "sesiones"} · {s.cards} cards
                 </span>
               </div>

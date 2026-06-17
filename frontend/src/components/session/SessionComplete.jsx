@@ -123,12 +123,12 @@ export default function SessionComplete({
             clave.
           </p>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col-reverse sm:flex-row gap-3 w-full sm:w-auto">
             <Button
               variant="outline"
               size="lg"
               onClick={onDashboard}
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto"
             >
               <Home className="size-5" />
               Ir al dashboard
@@ -136,7 +136,7 @@ export default function SessionComplete({
             <Button
               size="lg"
               onClick={onNewSession}
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto"
             >
               <RotateCcw className="size-5" />
               Nueva sesion

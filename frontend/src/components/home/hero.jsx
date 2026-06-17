@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, animate } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { useRouter } from "next/navigation"
 import { ArrowRight, Sparkles } from "lucide-react"
 
 const HERO_TEXT = "Prepárate para tu próxima entrevista técnica";
+const CHAR_INTERVAL = 60;
 
 export default function Hero() {
 
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
-  const [displayedText, setDisplayedText] = useState("")
   const [isTyping, setIsTyping] = useState(false)
+  const textRef = useRef(null)
 
   useEffect(() => {
     setMounted(true)
@@ -22,20 +23,32 @@ export default function Hero() {
     if (!mounted) return
 
     setIsTyping(true)
+    if (textRef.current) textRef.current.textContent = ""
+    let i = 0
+    let lastTime = 0
+    let rafId
 
-    const controls = animate(0, HERO_TEXT.length, {
-      duration: HERO_TEXT.length * 0.06,
-      ease: "linear",
-      onUpdate(latest) {
-        setDisplayedText(HERO_TEXT.slice(0, Math.floor(latest)))
-      },
-      onComplete() {
-        setDisplayedText(HERO_TEXT)
+    function step(timestamp) {
+      if (!lastTime) lastTime = timestamp
+      const elapsed = timestamp - lastTime
+
+      if (elapsed >= CHAR_INTERVAL) {
+        i++
+        lastTime = timestamp - (elapsed - CHAR_INTERVAL)
+        if (textRef.current) {
+          textRef.current.textContent = HERO_TEXT.slice(0, i)
+        }
+      }
+
+      if (i < HERO_TEXT.length) {
+        rafId = requestAnimationFrame(step)
+      } else {
         setIsTyping(false)
-      },
-    })
+      }
+    }
 
-    return () => controls.stop()
+    rafId = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(rafId)
   }, [mounted])
 
   return (
@@ -61,7 +74,7 @@ export default function Hero() {
         </motion.span>
 
       <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] mb-6 max-w-5xl">
-        {mounted ? displayedText : HERO_TEXT}
+        <span ref={textRef}>{mounted ? "" : HERO_TEXT}</span>
         {isTyping && (
           <motion.span
             animate={{ opacity: [1, 0, 1] }}
@@ -90,7 +103,7 @@ export default function Hero() {
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => router.push("/register")}
-          className="group inline-flex items-center gap-3 px-10 py-4 rounded-xl bg-gray-900 text-white text-lg font-medium shadow-lg shadow-gray-900/10 hover:shadow-xl hover:shadow-gray-900/20 transition-shadow cursor-pointer"
+          className="group inline-flex items-center gap-3 px-6 sm:px-10 py-3.5 sm:py-4 rounded-xl bg-gray-900 text-white text-base sm:text-lg font-medium shadow-lg shadow-gray-900/10 hover:shadow-xl hover:shadow-gray-900/20 transition-shadow cursor-pointer"
         >
           <span>Empezar ahora</span>
           <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
