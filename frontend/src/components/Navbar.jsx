@@ -13,7 +13,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import { LayoutDashboard, Play, LogOut, LogIn, UserPlus, Star, BarChart3, Menu, X } from "lucide-react"
+import { LayoutDashboard, Play, LogOut, LogIn, UserPlus, Star, BarChart3, Menu, X, User } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
 const BRAND = "InterviewKit"
@@ -36,6 +36,7 @@ function Navbar() {
       { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { path: "/stats", label: "Stats", icon: BarChart3 },
       { path: "/session", label: "Nueva sesion", icon: Play },
+      { path: "/profile", label: "Perfil", icon: User },
     ]
   ) : []
 
