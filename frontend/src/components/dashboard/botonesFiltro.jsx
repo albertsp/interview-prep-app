@@ -1,11 +1,10 @@
-import { Code2, X, ArrowUpAZ, ArrowDownZA } from "lucide-react"
+import { Code2, X } from "lucide-react"
 import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/components/ui/toggle-group"
 
-// Añadimos setOrderSort a las props para que controle el ordenamiento
-export function ToggleGroupDemo({ setLanguageFilter, setOrderSort }) {
+export function FilterButtons({ setLanguageFilter }) {
   return (
     <div className="flex flex-wrap gap-3 sm:gap-4 items-center">
       
@@ -33,15 +32,6 @@ export function ToggleGroupDemo({ setLanguageFilter, setOrderSort }) {
         <ToggleGroupItem value="" aria-label="Limpiar filtro" className="text-xs">
           <X className="size-3.5 mr-1.5" />
           Reset
-        </ToggleGroupItem>
-      </ToggleGroup>
-
-      <ToggleGroup variant="outline" type="single" defaultValue="desc" onValueChange={setOrderSort}>
-        <ToggleGroupItem value="asc" aria-label="Ordenar de más antiguo a más reciente">
-          <ArrowUpAZ className="size-4 mr-1.5" />          
-        </ToggleGroupItem>
-        <ToggleGroupItem value="desc" aria-label="Ordenar de más reciente a más antiguo">
-          <ArrowDownZA className="size-4 mr-1.5" />
         </ToggleGroupItem>
       </ToggleGroup>
 

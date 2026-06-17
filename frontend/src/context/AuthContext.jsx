@@ -68,8 +68,13 @@ export function AuthProvider({children}){
         setStats(DEFAULT_STATS)
     }
 
+    function updateUserName(name) {
+        localStorage.setItem("user", name)
+        setUser(name)
+    }
+
     return(
-        <AuthContext.Provider value={{token, user, stats, initialized, login, logout, refreshStats}}>
+        <AuthContext.Provider value={{token, user, stats, initialized, login, logout, refreshStats, updateUserName}}>
             {children}
         </AuthContext.Provider>
     )

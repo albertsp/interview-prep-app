@@ -4,8 +4,9 @@ import { useAuth } from "@/context/AuthContext";
 
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { InputGroupDemo } from "@/components/dashboard/barrabusqueda";
-import { ToggleGroupDemo } from "@/components/dashboard/botonesFiltro";
+import { SearchBar } from "@/components/dashboard/barrabusqueda";
+import { SortOrder } from "@/components/dashboard/SortOrder";
+import { FilterButtons } from "@/components/dashboard/botonesFiltro";
 import { SingleCard } from "@/components/dashboard/singleCard";
 
 export default function DashboardPage() {
@@ -119,10 +120,11 @@ export default function DashboardPage() {
       {/* Todo el contenido ahora comparte el mismo ancho máximo centrado */}
       <div className="max-w-6xl mx-auto">
 
-        {/* Contenedor para los buscadores y filtros con separación */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-center mb-10">
-          <InputGroupDemo setSearchInput={setSearchInput} />
-          <ToggleGroupDemo setLanguageFilter={setLanguageFilter} setOrderSort={setOrderSort} />
+        {/* Contenedor para los buscadores y filtros */}
+        <div className="flex flex-wrap items-center gap-10 mb-10">
+          <SearchBar setSearchInput={setSearchInput} />
+          <SortOrder setOrderSort={setOrderSort} />
+          <FilterButtons setLanguageFilter={setLanguageFilter} />
         </div>
         
         {/* Contenedor Grid adaptable a pantallas móviles, tablets y escritorio */}

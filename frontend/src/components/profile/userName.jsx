@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
-export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, token, profile, setProfile}) {
+export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, token, profile, setProfile, updateUserName}) {
   const [newName, setNewName] = useState(profile?.name || "")
 
   const handleSave = async () => {
@@ -31,6 +31,8 @@ export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, t
     if (response.ok) {
       const data = await response.json()
       setProfile({ ...profile, name: data.name })
+      localStorage.setItem("user", data.name)
+      updateUserName(data.name)
       setIsOpenChangeUserName(false)
     }
   }

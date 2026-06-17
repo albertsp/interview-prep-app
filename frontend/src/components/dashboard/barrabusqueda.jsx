@@ -6,7 +6,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group"
 
-export function InputGroupDemo( {setSearchInput}) {
+export function SearchBar( {setSearchInput}) {
   return (
     <InputGroup className="w-full sm:max-w-xs">
       <InputGroupInput onChange={(e) => setSearchInput(e.target.value)} placeholder="Search..." />

@@ -28,7 +28,7 @@ const itemVariants = {
 
 export default function ProfilePage() {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    const { token } = useAuth();
+    const { token, updateUserName } = useAuth();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isOpenChangeUserName, setIsOpenChangeUserName] = useState(false);
@@ -66,8 +66,8 @@ export default function ProfilePage() {
         : 0;
 
     return (
-        <div className="flex min-h-[80vh] bg-slate-50 items-center justify-center p-4">
-            <ChangeUserName isOpenChangeUserName={isOpenChangeUserName} setIsOpenChangeUserName={setIsOpenChangeUserName} token={token} profile={profile} setProfile={setProfile}/>
+        <div className="flex min-h-[80vh] bg-white [background-image:linear-gradient(to_right,rgba(0,0,0,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.04)_1px,transparent_1px)] [background-size:64px_64px] items-center justify-center p-4">
+            <ChangeUserName isOpenChangeUserName={isOpenChangeUserName} setIsOpenChangeUserName={setIsOpenChangeUserName} token={token} profile={profile} setProfile={setProfile} updateUserName={updateUserName}/>
             <motion.div
                 className="w-full max-w-md"
                 variants={containerVariants}
