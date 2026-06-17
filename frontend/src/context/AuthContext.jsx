@@ -11,6 +11,11 @@ const DEFAULT_STATS = {
   xp_to_next_level: 500,
   progress_in_level: 0,
   xp_per_level: 500,
+  results_summary: { correct: 0, partially_correct: 0, incorrect: 0 },
+  stacks_stats: [],
+  sessions_count: 0,
+  recent_sessions: [],
+  cards_summary: { total: 0, top_tags: [] },
 };
 
 export function AuthProvider({children}){
@@ -34,6 +39,11 @@ export function AuthProvider({children}){
                 xp_to_next_level: data.xp_to_next_level ?? 500,
                 progress_in_level: data.progress_in_level ?? 0,
                 xp_per_level: data.xp_per_level ?? 500,
+                results_summary: data.results_summary ?? DEFAULT_STATS.results_summary,
+                stacks_stats: data.stacks_stats ?? DEFAULT_STATS.stacks_stats,
+                sessions_count: data.sessions_count ?? DEFAULT_STATS.sessions_count,
+                recent_sessions: data.recent_sessions ?? DEFAULT_STATS.recent_sessions,
+                cards_summary: data.cards_summary ?? DEFAULT_STATS.cards_summary,
             })
         } catch {
             // Si falla, mantenemos las stats anteriores
