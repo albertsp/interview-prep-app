@@ -70,6 +70,10 @@ export function AuthProvider({children}){
         setUser(logUser)
         refreshStats(logToken)
     }
+    function updateUser(newName){
+        localStorage.setItem("user", newName)
+        setUser(newName)
+    }
     function logout(){
         localStorage.removeItem("token")
         localStorage.removeItem("user")
@@ -79,7 +83,7 @@ export function AuthProvider({children}){
     }
 
     return(
-        <AuthContext.Provider value={{token, user, stats, initialized, login, logout, refreshStats}}>
+        <AuthContext.Provider value={{token, user, stats, initialized, login, logout, refreshStats, updateUser}}>
             {children}
         </AuthContext.Provider>
     )

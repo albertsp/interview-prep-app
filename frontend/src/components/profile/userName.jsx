@@ -13,9 +13,12 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { API_URL, headers, handleResponse } from "@/services/httpClient"
+import { useAuth } from "@/context/AuthContext"
 
 export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, token, profile, setProfile}) {
   const [newName, setNewName] = useState(profile?.name || "")
+
+  const { updateUser } = useAuth()
 
   const handleSave = async () => {
     if (!newName.trim()) return
@@ -28,6 +31,7 @@ export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, t
             })
         )
         setProfile({ ...profile, name: data.name })
+        updateUser(data.name)
         setIsOpenChangeUserName(false)
     } catch {
         // Error handled by handleResponse
