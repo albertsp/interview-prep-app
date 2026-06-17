@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Pencil, Mail, Trophy, Star } from 'lucide-react';
 import { useAuth } from "@/context/AuthContext";
-import { API_URL, headers, handleResponse } from "@/services/httpClient";
+import { API_URL, handleResponse } from "@/services/httpClient";
 
 import {
     Card,
@@ -28,18 +28,18 @@ const itemVariants = {
 
 
 export default function ProfilePage() {
-    const { token } = useAuth();
+    const { user } = useAuth();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isOpenChangeUserName, setIsOpenChangeUserName] = useState(false);
 
     const getProfile = async () => {
-        if (!token) return;
+        if (!user) return;
         try {
             const data = await handleResponse(
                 await fetch(`${API_URL}/me/profile`, {
                     method: 'GET',
-                    headers: headers(token),
+                    credentials: 'include',
                 })
             );
             setProfile(data);
@@ -51,7 +51,7 @@ export default function ProfilePage() {
 
     useEffect(() => {
         getProfile()
-    }, [token]);
+    }, [user]);
 
     if (loading) return null;
 
@@ -65,7 +65,7 @@ export default function ProfilePage() {
 
     return (
         <div className="flex min-h-[80vh] bg-slate-50 items-center justify-center p-4">
-            <ChangeUserName isOpenChangeUserName={isOpenChangeUserName} setIsOpenChangeUserName={setIsOpenChangeUserName} token={token} profile={profile} setProfile={setProfile}/>
+            <ChangeUserName isOpenChangeUserName={isOpenChangeUserName} setIsOpenChangeUserName={setIsOpenChangeUserName} profile={profile} setProfile={setProfile}/>
             <motion.div
                 className="w-full max-w-md"
                 variants={containerVariants}

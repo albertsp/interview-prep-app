@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { getMyStats } from "@/services/sessionService";
+import { logoutUser } from "@/services/authService";
 
 const AuthContext = createContext()
 
@@ -21,18 +22,12 @@ const DEFAULT_STATS = {
 export function AuthProvider({children}){
 
     const [user, setUser] = useState("")
-    const [token, setToken] = useState("")
-    // Stats de gamificacion del usuario (XP, level, etc.)
     const [stats, setStats] = useState(DEFAULT_STATS)
-    // Controla si ya se leyo localStorage para evitar redirecciones prematuras
     const [initialized, setInitialized] = useState(false)
 
-    // Refresca las stats del usuario desde el backend
-    const refreshStats = useCallback(async (activeToken) => {
-        const t = activeToken || token
-        if (!t) return
+    const refreshStats = useCallback(async () => {
         try {
-            const data = await getMyStats(t)
+            const data = await getMyStats()
             setStats({
                 total_xp: data.total_xp ?? 0,
                 level: data.level ?? 1,
@@ -48,42 +43,41 @@ export function AuthProvider({children}){
         } catch {
             // Si falla, mantenemos las stats anteriores
         }
-    }, [token])
+    }, [])
 
     useEffect(() => {
         const savedUser = localStorage.getItem("user")
-        if (savedUser) setUser(savedUser)
-        const savedToken = localStorage.getItem("token")
-        if (savedToken) {
-            setToken(savedToken)
-            // Cargamos stats al iniciar sesion
-            refreshStats(savedToken)
+        if (savedUser) {
+            setUser(savedUser)
+            refreshStats()
         }
-        // Marcamos que el contexto ya esta listo
         setInitialized(true)
     }, [refreshStats])
 
-    function login(logUser, logToken){
-        localStorage.setItem("token", logToken)
+    function login(logUser){
         localStorage.setItem("user", logUser)
-        setToken(logToken)
         setUser(logUser)
-        refreshStats(logToken)
+        refreshStats()
     }
+
     function updateUser(newName){
         localStorage.setItem("user", newName)
         setUser(newName)
     }
-    function logout(){
-        localStorage.removeItem("token")
+
+    async function logout(){
+        try {
+            await logoutUser()
+        } catch {
+            // Si falla el logout en backend, igual limpiamos localmente
+        }
         localStorage.removeItem("user")
-        setToken("")
         setUser("")
         setStats(DEFAULT_STATS)
     }
 
     return(
-        <AuthContext.Provider value={{token, user, stats, initialized, login, logout, refreshStats, updateUser}}>
+        <AuthContext.Provider value={{user, stats, initialized, login, logout, refreshStats, updateUser}}>
             {children}
         </AuthContext.Provider>
     )

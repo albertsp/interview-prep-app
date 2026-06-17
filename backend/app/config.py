@@ -15,10 +15,19 @@ def _get_database_url():
 class Config:
     SQLALCHEMY_DATABASE_URI = _get_database_url()
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+    if not JWT_SECRET_KEY:
+        raise RuntimeError("JWT_SECRET_KEY es obligatorio. Definir en .env o variables de entorno.")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(
         hours=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES_HOURS", "1"))
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # JWT en cookies httpOnly para proteccion contra XSS
+    JWT_TOKEN_LOCATION = ["cookies"]
+    JWT_COOKIE_SECURE = os.getenv("FLASK_ENV") == "production"
+    JWT_COOKIE_CSRF_PROTECT = False
+    JWT_ACCESS_COOKIE_PATH = "/"
+    JWT_COOKIE_SAMESITE = "None" if os.getenv("FLASK_ENV") == "production" else "Lax"
 
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 

@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify
+from flask_jwt_extended import jwt_required
 from .. import db
 from sqlalchemy import text
 
@@ -6,6 +7,7 @@ debug = Blueprint('debug', __name__, url_prefix='/debug')
 
 
 @debug.route('/db', methods=['GET'])
+@jwt_required()
 def db_status():
     try:
         result = db.session.execute(text(

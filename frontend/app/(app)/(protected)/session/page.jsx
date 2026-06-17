@@ -21,7 +21,7 @@ import SessionComplete from "@/components/session/SessionComplete";
 
 export default function SessionPage() {
   // Obtenemos el token JWT y el refrescador de stats del contexto
-  const { token, refreshStats } = useAuth();
+  const { user, refreshStats } = useAuth();
   const router = useRouter();
   // Reducer que controla todo el flujo de la sesion
   const [state, dispatch] = useReducer(sessionReducer, initialState);
@@ -40,7 +40,7 @@ export default function SessionPage() {
     setError(null);
 
     try {
-      const data = await createSession(token, select);
+      const data = await createSession(select);
       dispatch({ type: "INIT_SESSION", payload: data });
       completeCalledRef.current = false;
     } catch (err) {
@@ -58,7 +58,6 @@ export default function SessionPage() {
 
     try {
       const data = await submitAnswer(
-        token,
         state.session_id,
         question.question_id,
         state.currentAnswer
@@ -79,7 +78,7 @@ export default function SessionPage() {
     const question = state.questions[state.currentQuestionIndex];
 
     try {
-      await saveCard(token, {
+      await saveCard({
         question_id: question.question_id,
         session_id: state.session_id,
         concept: state.card.concept,
@@ -109,11 +108,11 @@ export default function SessionPage() {
     let cancelled = false;
     (async () => {
       try {
-        const data = await completeSession(token, state.session_id);
+        const data = await completeSession(state.session_id);
         if (cancelled) return;
         dispatch({ type: "SESSION_COMPLETED", payload: data });
         // Refrescamos las stats del navbar con los nuevos valores
-        refreshStats(token);
+        refreshStats();
       } catch (err) {
         if (cancelled) return;
         // Si falla, igual mostramos la pantalla de complete con XP 0
@@ -133,7 +132,7 @@ export default function SessionPage() {
     return () => {
       cancelled = true;
     };
-  }, [state.currentPhase, state.session_id, token, refreshStats]);
+  }, [state.currentPhase, state.session_id, user, refreshStats]);
 
   // --- RENDERIZADO ---
 

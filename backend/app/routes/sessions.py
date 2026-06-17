@@ -118,6 +118,10 @@ def complete_session(session_id):
     if user_session is None:
         return jsonify({"msg": "La sesion no existe"}), 404
 
+    # Proteccion contra idempotencia: si ya fue completada, no se puede repetir
+    if user_session.is_completed:
+        return jsonify({"msg": "Esta sesion ya fue completada"}), 409
+
     # Obtenemos todas las preguntas respondidas
     questions = Question.query.filter_by(session_id=session_id).all()
     answered = [q for q in questions if q.result is not None]
@@ -147,6 +151,9 @@ def complete_session(session_id):
 
     user.total_xp = (user.total_xp or 0) + xp_earned
     user.level = compute_level(user.total_xp)
+
+    # Marcamos la sesion como completada para evitar duplicar XP
+    user_session.is_completed = True
     db.session.commit()
 
     return jsonify({

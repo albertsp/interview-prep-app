@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify, current_app
 from ..models.user import User
 import bcrypt
 from .. import db
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, set_access_cookies, unset_access_cookies
 
 
 EMAIL_REGEX = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
@@ -16,6 +16,8 @@ auth = Blueprint('auth', __name__, url_prefix='/auth')
 @auth.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
+    if data is None:
+        return jsonify({"error": "El cuerpo de la peticion debe ser JSON"}), 400
 
     name = (data.get("name") or "").strip()
     email = (data.get("email") or "").strip()
@@ -39,31 +41,40 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"succes": "Usuario creado correctamente"}), 201
+    return jsonify({"success": "Usuario creado correctamente"}), 201
 
 @auth.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
+    if data is None:
+        return jsonify({"error": "El cuerpo de la peticion debe ser JSON"}), 400
 
-    #Validamos que no haya campos vacios
-    if data.get("email") is None or data.get("password") is None:
+    email = data.get("email") or ""
+    password = data.get("password") or ""
+
+    if not email or not password:
         return jsonify({"error": "Los campos no pueden estar vacios"}), 400
 
-    # Query para obtener el user de BD como objeto con atributos
-    user = User.query.filter_by(email=data.get("email")).first()
+    user = User.query.filter_by(email=email).first()
 
-    # Buscamos user en BD
     if user is None:
         return jsonify({"error": "Credenciales incorrectas"}), 400
-    
-    # Password del request encoded
-    encodedPassword = data.get("password").encode('utf-8')
 
-    # Comprobamos que coincidan los hashes
+    encodedPassword = password.encode('utf-8')
+
     if bcrypt.checkpw(encodedPassword, user.password.encode('utf-8')) is False:
         return jsonify({"error": "Credenciales incorrectas"}), 400
-    
-    # Creamos un acces token
+
     expires_delta = current_app.config["JWT_ACCESS_TOKEN_EXPIRES"]
     access_token = create_access_token(identity=str(user.user_id), expires_delta=expires_delta)
-    return jsonify(access_token=access_token, user_id =user.user_id, name = user.name), 200
+
+    response = jsonify({"user_id": user.user_id, "name": user.name})
+    set_access_cookies(response, access_token)
+    return response, 200
+
+
+@auth.route('/logout', methods=['POST'])
+def logout():
+    response = jsonify({"msg": "Sesion cerrada correctamente"})
+    unset_access_cookies(response)
+    return response, 200

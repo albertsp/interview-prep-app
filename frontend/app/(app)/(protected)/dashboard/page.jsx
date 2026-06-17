@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/AuthContext";
-import { API_URL, headers, handleResponse } from "@/services/httpClient";
+import { API_URL, handleResponse } from "@/services/httpClient";
 
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,18 +12,18 @@ import { SingleCard } from "@/components/dashboard/singleCard";
 export default function DashboardPage() {
 
   const [cards, setCards] = useState([])
-  const { token } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
-    getCards()
-  }, [token])
+    if (user) getCards()
+  }, [user])
 
   const getCards = async () => {
     try {
         const data = await handleResponse(
             await fetch(`${API_URL}/cards/`, {
                 method: 'GET',
-                headers: headers(token),
+                credentials: 'include',
             })
         )
         setCards(data)
@@ -62,7 +62,7 @@ export default function DashboardPage() {
         await handleResponse(
             await fetch(`${API_URL}/cards/${card_id}`, {
                 method: 'DELETE',
-                headers: headers(token),
+                credentials: 'include',
             })
         )
         setIsSingleCardOpen(false)
@@ -94,7 +94,8 @@ export default function DashboardPage() {
         await handleResponse(
             await fetch(`${API_URL}/cards/${selectedCard.card_id}`, {
                 method: 'PATCH',
-                headers: headers(token),
+                credentials: 'include',
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(selectedCard)
             })
         )

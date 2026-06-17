@@ -11,3 +11,4 @@ class Session(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer,db.ForeignKey(User.user_id))
     feedback = db.Column(db.String(250), nullable=True)
+    is_completed = db.Column(db.Boolean, default=False, nullable=False)

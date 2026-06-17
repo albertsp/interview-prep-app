@@ -29,7 +29,7 @@ export default function LoginPage() {
 
     try {
       const result = await loginUser(email, password);
-      login(result.name, result.access_token);
+      login(result.name);
       router.push("/session");
     } catch (err) {
       setError(err.message);

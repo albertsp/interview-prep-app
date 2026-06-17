@@ -23,7 +23,7 @@ function BrandText() {
 }
 
 function Navbar() {
-  const { token, user, stats, logout } = useAuth()
+  const { user, stats, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
   const initials = user ? user.charAt(0).toUpperCase() : "U"
@@ -31,7 +31,7 @@ function Navbar() {
 
   const isActive = (path) => pathname === path
 
-  const navLinks = token ? (
+  const navLinks = user ? (
     [
       { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { path: "/stats", label: "Stats", icon: BarChart3 },
@@ -54,7 +54,7 @@ function Navbar() {
           <BrandText />
         </motion.button>
 
-        {token && (
+        {user && (
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map(({ path, label, icon: Icon }) => (
               <Button
@@ -72,7 +72,7 @@ function Navbar() {
         )}
 
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {token && (
+          {user && (
             <div
               className="hidden sm:flex items-center gap-2 rounded-lg border border-border/50 bg-background px-3 py-1.5 text-sm"
               title={`${stats.total_xp} XP · ${stats.xp_to_next_level} XP para Nv ${stats.level + 1}`}
@@ -83,7 +83,7 @@ function Navbar() {
             </div>
           )}
 
-          {token ? (
+          {user ? (
             <>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -145,7 +145,7 @@ function Navbar() {
       </div>
 
       <AnimatePresence>
-        {mobileMenuOpen && token && (
+        {mobileMenuOpen && user && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}

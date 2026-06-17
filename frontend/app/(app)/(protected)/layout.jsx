@@ -5,17 +5,17 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 export default function ProtectedLayout({ children }) {
-  const { token, initialized } = useAuth();
+  const { user, initialized } = useAuth();
   const router = useRouter();
 
-  // No redirigimos hasta que AuthContext haya leido localStorage
+  // No redirigimos hasta que AuthContext haya verificado la sesion
   useEffect(() => {
-    if (initialized && !token) router.replace("/");
-  }, [initialized, token, router]);
+    if (initialized && !user) router.replace("/");
+  }, [initialized, user, router]);
 
   // Mientras se inicializa el contexto, no renderizamos nada
   if (!initialized) return null;
-  // Si ya se inicializo y no hay token, redirigimos
-  if (!token) return null;
+  // Si ya se inicializo y no hay usuario, redirigimos
+  if (!user) return null;
   return <>{children}</>;
 }

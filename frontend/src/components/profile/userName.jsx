@@ -12,10 +12,10 @@ import {
   DialogClose
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { API_URL, headers, handleResponse } from "@/services/httpClient"
+import { API_URL, handleResponse } from "@/services/httpClient"
 import { useAuth } from "@/context/AuthContext"
 
-export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, token, profile, setProfile}) {
+export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, profile, setProfile}) {
   const [newName, setNewName] = useState(profile?.name || "")
 
   const { updateUser } = useAuth()
@@ -26,7 +26,8 @@ export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, t
         const data = await handleResponse(
             await fetch(`${API_URL}/me/profile`, {
                 method: 'PATCH',
-                headers: headers(token),
+                credentials: 'include',
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name: newName.trim() })
             })
         )
