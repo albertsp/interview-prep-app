@@ -2,7 +2,7 @@
 
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { STACK_COLORS } from "@/data/mockStats";
+import { STACK_COLORS } from "@/data/statsTheme";
 import { Layers } from "lucide-react";
 
 const STACK_ICONS = {

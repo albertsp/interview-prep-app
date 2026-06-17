@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
-import { STACK_COLORS, LEVEL_BADGES } from "@/data/mockStats";
+import { STACK_COLORS, LEVEL_BADGES } from "@/data/statsTheme";
 
 function formatDate(dateStr) {
   const date = new Date(dateStr);

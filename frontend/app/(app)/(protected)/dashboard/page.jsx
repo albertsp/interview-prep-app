@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from "react"
 import { useAuth } from "@/context/AuthContext";
+import { API_URL, headers, handleResponse } from "@/services/httpClient";
 
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,6 @@ import { SingleCard } from "@/components/dashboard/singleCard";
 
 export default function DashboardPage() {
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [cards, setCards] = useState([])
   const { token } = useAuth();
 
@@ -19,20 +19,16 @@ export default function DashboardPage() {
   }, [token])
 
   const getCards = async () => {
-    const response = await fetch(`${API_URL}/cards/`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        "Content-Type": "application/json"
-      }
-    });
-    if (response.ok) {
-      const data = await response.json()
-      setCards(data)
-      console.log(data)
-    } else {
-      console.log('error: ', response.status, response.statusText)
-      return { error: { status: response.status, statusText: response.statusText } }
+    try {
+        const data = await handleResponse(
+            await fetch(`${API_URL}/cards/`, {
+                method: 'GET',
+                headers: headers(token),
+            })
+        )
+        setCards(data)
+    } catch {
+        // Error handled by handleResponse
     }
   }
 
@@ -62,23 +58,19 @@ export default function DashboardPage() {
 
   // Eliminar una Card 
   const deleteCard = async (card_id) => {
-    const response = await fetch(`${API_URL}/cards/${card_id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        "Content-Type": "application/json"
-      }
-    });
-    if (response.ok) {
-      setIsSingleCardOpen(false)
-      setSelectedCard(null)
-      getCards()
-      const data = await response.json();
-      return data;
-    } else {
-      console.log('error: ', response.status, response.statusText);
-      return { error: { status: response.status, statusText: response.statusText } };
-    };
+    try {
+        await handleResponse(
+            await fetch(`${API_URL}/cards/${card_id}`, {
+                method: 'DELETE',
+                headers: headers(token),
+            })
+        )
+        setIsSingleCardOpen(false)
+        setSelectedCard(null)
+        getCards()
+    } catch {
+        // Error handled by handleResponse
+    }
   }
 
   //abrir una sola card
@@ -98,19 +90,20 @@ export default function DashboardPage() {
 
   const saveCard = async () => {
     if (!selectedCard) return
-    const response = await fetch(`${API_URL}/cards/${selectedCard.card_id}`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(selectedCard)
-    })
-    if (response.ok) {
-      setIsSingleCardOpen(false)
-      setSelectedCard(null)
-      setOriginalCard(null)
-      getCards()
+    try {
+        await handleResponse(
+            await fetch(`${API_URL}/cards/${selectedCard.card_id}`, {
+                method: 'PATCH',
+                headers: headers(token),
+                body: JSON.stringify(selectedCard)
+            })
+        )
+        setIsSingleCardOpen(false)
+        setSelectedCard(null)
+        setOriginalCard(null)
+        getCards()
+    } catch {
+        // Error handled by handleResponse
     }
   }
 
@@ -121,7 +114,7 @@ export default function DashboardPage() {
 
         {/* Contenedor para los buscadores y filtros con separación */}
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-center mb-10">
-          <InputGroupDemo setSearchInput={setSearchInput} />
+          <InputGroupDemo setSearchInput={setSearchInput} resultCount={filtered_cards.length} />
           <ToggleGroupDemo setLanguageFilter={setLanguageFilter} setOrderSort={setOrderSort} />
         </div>
         

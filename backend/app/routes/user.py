@@ -22,7 +22,7 @@ def get_my_stats():
 
     total_xp = user_row.total_xp or 0
     level = user_row.level or 1
-    progress_in_level = total_xp - ((level - 1) * XP_PER_LEVEL)
+    progress_in_level = max(0, total_xp - ((level - 1) * XP_PER_LEVEL))
 
     # --- Results summary: count questions by result ---
     result_counts = (
