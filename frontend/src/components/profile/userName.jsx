@@ -12,30 +12,28 @@ import {
   DialogClose
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { API_URL, handleResponse } from "@/services/httpClient"
 import { useAuth } from "@/context/AuthContext"
+import { updateProfile } from "@/services/profileService"
 
 export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, profile, setProfile}) {
   const [newName, setNewName] = useState(profile?.name || "")
-
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
   const { updateUser } = useAuth()
 
   const handleSave = async () => {
     if (!newName.trim()) return
+    setSaving(true)
+    setError(null)
     try {
-        const data = await handleResponse(
-            await fetch(`${API_URL}/me/profile`, {
-                method: 'PATCH',
-                credentials: 'include',
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: newName.trim() })
-            })
-        )
-        setProfile({ ...profile, name: data.name })
-        updateUser(data.name)
-        setIsOpenChangeUserName(false)
-    } catch {
-        // Error handled by handleResponse
+      const data = await updateProfile(newName.trim())
+      setProfile({ ...profile, name: data.name })
+      updateUser(data.name)
+      setIsOpenChangeUserName(false)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -48,6 +46,9 @@ export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, p
             Escribe tu nuevo nombre de usuario
           </DialogDescription>
         </DialogHeader>
+        {error && (
+          <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-3 py-2">{error}</p>
+        )}
         <div className="px-4 pb-2">
           <Input
             id="newName"
@@ -59,9 +60,11 @@ export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, p
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancelar</Button>
+            <Button variant="outline" disabled={saving}>Cancelar</Button>
           </DialogClose>
-          <Button onClick={handleSave}>Guardar</Button>
+          <Button onClick={handleSave} disabled={saving || !newName.trim()}>
+            {saving ? "Guardando..." : "Guardar"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

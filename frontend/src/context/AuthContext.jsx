@@ -1,8 +1,9 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { getMyStats } from "@/services/sessionService";
 import { logoutUser } from "@/services/authService";
+import { setOnUnauthorized } from "@/services/httpClient";
 
 const AuthContext = createContext()
 
@@ -24,8 +25,20 @@ export function AuthProvider({children}){
     const [user, setUser] = useState("")
     const [stats, setStats] = useState(DEFAULT_STATS)
     const [initialized, setInitialized] = useState(false)
+    const refreshingRef = useRef(false)
+
+    // Registrar interceptor 401 para limpiar sesion automaticamente
+    useEffect(() => {
+        setOnUnauthorized(() => {
+            localStorage.removeItem("user")
+            setUser("")
+            setStats(DEFAULT_STATS)
+        })
+    }, [])
 
     const refreshStats = useCallback(async () => {
+        if (refreshingRef.current) return
+        refreshingRef.current = true
         try {
             const data = await getMyStats()
             setStats({
@@ -42,6 +55,8 @@ export function AuthProvider({children}){
             })
         } catch {
             // Si falla, mantenemos las stats anteriores
+        } finally {
+            refreshingRef.current = false
         }
     }, [])
 
@@ -52,7 +67,8 @@ export function AuthProvider({children}){
             refreshStats()
         }
         setInitialized(true)
-    }, [refreshStats])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     function login(logUser){
         localStorage.setItem("user", logUser)

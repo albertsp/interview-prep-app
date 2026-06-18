@@ -9,7 +9,7 @@ import {
 export function InputGroupDemo({ setSearchInput, resultCount }) {
   return (
     <InputGroup className="w-full sm:max-w-xs">
-      <InputGroupInput onChange={(e) => setSearchInput(e.target.value)} placeholder="Buscar..." />
+      <InputGroupInput onChange={(e) => setSearchInput(e.target.value)} placeholder="Buscar..." aria-label="Buscar cards" />
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>

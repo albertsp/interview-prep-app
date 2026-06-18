@@ -25,6 +25,24 @@ export default function LoginPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
+
+    if (!email.trim()) {
+      setError("El email es obligatorio");
+      return;
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setError("El formato del email no es valido");
+      return;
+    }
+    if (!password) {
+      setError("La contrasena es obligatoria");
+      return;
+    }
+    if (password.length < 8) {
+      setError("La contrasena debe tener al menos 8 caracteres");
+      return;
+    }
+
     setLoading(true);
 
     try {
