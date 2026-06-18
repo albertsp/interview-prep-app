@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useMemo, useCallback } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useAuth } from "@/context/AuthContext";
 import { getCards, updateCard, deleteCardById } from "@/services/cardService";
 
@@ -15,6 +15,15 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const { user } = useAuth();
+
+  const [selectedCard, setSelectedCard] = useState(null)
+  const [originalCard, setOriginalCard] = useState(null)
+  const [isSingleCardOpen, setIsSingleCardOpen] = useState(null)
+
+  const [searchInput, setSearchInput] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [languageFilter, setLanguageFilter] = useState("")
+  const [orderSort, setOrderSort] = useState("desc")
 
   useEffect(() => {
     if (!user) return
@@ -32,11 +41,6 @@ export default function DashboardPage() {
       })
     return () => { cancelled = true }
   }, [user])
-
-  const [searchInput, setSearchInput] = useState("")
-  const [debouncedSearch, setDebouncedSearch] = useState("")
-  const [languageFilter, setLanguageFilter] = useState("")
-  const [orderSort, setOrderSort] = useState("desc")
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(searchInput), 250)
@@ -58,7 +62,7 @@ export default function DashboardPage() {
       })
   }, [cards, debouncedSearch, languageFilter, orderSort])
 
-  const handleDeleteCard = useCallback(async (card_id) => {
+  const handleDeleteCard = async (card_id) => {
     try {
       await deleteCardById(card_id)
       setIsSingleCardOpen(false)
@@ -69,9 +73,9 @@ export default function DashboardPage() {
     } catch (err) {
       setError(err.message)
     }
-  }, [])
+  }
 
-  const handleSaveCard = useCallback(async () => {
+  const handleSaveCard = async () => {
     if (!selectedCard) return
     try {
       await updateCard(selectedCard.card_id, selectedCard)
@@ -83,11 +87,7 @@ export default function DashboardPage() {
     } catch (err) {
       setError(err.message)
     }
-  }, [selectedCard])
-
-  const [selectedCard, setSelectedCard] = useState(null)
-  const [originalCard, setOriginalCard] = useState(null)
-  const [isSingleCardOpen, setIsSingleCardOpen] = useState(null)
+  }
 
   const abrirCard = (card) => {
     setIsSingleCardOpen(true)
