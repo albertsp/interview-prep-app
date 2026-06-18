@@ -62,10 +62,10 @@ export default function RecentSessions({ sessions }) {
         {sessions.slice(0, 5).map((session, i) => {
           const colors = STACK_COLORS[session.stack] || {
             bg: "bg-gray-500/10",
-            text: "text-gray-700",
+            text: "text-gray-400",
             ring: "ring-gray-500/30",
           };
-          const levelBadge = LEVEL_BADGES[session.level] || "bg-gray-500/10 text-gray-700 border-gray-500/30";
+          const levelBadge = LEVEL_BADGES[session.level] || "bg-gray-500/10 text-gray-400 border-gray-500/30";
 
           return (
             <motion.div
@@ -99,7 +99,7 @@ export default function RecentSessions({ sessions }) {
                     total={session.total_questions}
                   />
                   <div className="flex justify-between text-[11px] text-muted-foreground mt-1 tabular-nums">
-                    <span className="text-green-600">{session.correct} correctas</span>
+                    <span className="text-green-500">{session.correct} correctas</span>
                     <span>
                       {session.correct}/{session.total_questions} aciertos
                     </span>

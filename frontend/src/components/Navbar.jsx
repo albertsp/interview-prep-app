@@ -121,10 +121,12 @@ function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <button
-                className="flex md:hidden items-center justify-center size-9 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
+<button
+                 className="flex md:hidden items-center justify-center size-9 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                 aria-expanded={mobileMenuOpen}
+                 aria-label={mobileMenuOpen ? "Cerrar menu" : "Abrir menu"}
+               >
                 {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
               </button>
             </>

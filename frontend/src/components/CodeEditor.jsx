@@ -50,7 +50,7 @@ export default function CodeEditor({ value, onChange, placeholder = "", ariaLabe
           "&.cm-focused": {
             outline: "none",
             borderColor: "var(--ring)",
-            boxShadow: "0 0 0 3px hsl(var(--ring) / 0.5)",
+            boxShadow: "0 0 0 3px var(--ring)",
           },
           ".cm-scroller": {
             fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",

@@ -46,7 +46,7 @@ export function SingleCard({ isSingleCardOpen, setIsSingleCardOpen, selectedCard
             <DialogFooter className="gap-2">
               <Button
                 variant="destructive"
-                className="text-xs font-medium px-3 py-1.5 h-auto bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 shadow-none"
+                className="text-xs font-medium px-3 py-1.5 h-auto shadow-none"
                 onClick={() => { abrirDelete() }}>
                 Eliminar
               </Button>

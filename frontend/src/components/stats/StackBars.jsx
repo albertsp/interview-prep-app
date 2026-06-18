@@ -14,12 +14,12 @@ const STACK_ICONS = {
 };
 
 const CUSTOM_TOOLTIP_STYLE = {
-  backgroundColor: "hsl(var(--card))",
-  border: "1px solid hsl(var(--border))",
+  backgroundColor: "var(--card)",
+  border: "1px solid var(--border)",
   borderRadius: "0.75rem",
   padding: "0.5rem 0.75rem",
   fontSize: "0.8125rem",
-  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.3)",
 };
 
 function CustomTooltip({ active, payload }) {
@@ -75,7 +75,7 @@ export default function StackBars({ stacks }) {
           {stacks.map((s) => {
             const colors = STACK_COLORS[s.stack] || {
               bg: "bg-gray-500/10",
-              text: "text-gray-700",
+              text: "text-gray-400",
               ring: "ring-gray-500/30",
             };
             const icon = STACK_ICONS[s.stack] || s.stack.slice(0, 2).toUpperCase();
@@ -100,7 +100,7 @@ export default function StackBars({ stacks }) {
             <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
               <XAxis type="number" hide />
               <YAxis type="category" dataKey="icon" width={36} tickLine={false} axisLine={false} tick={{ fontSize: 11, fontWeight: 600 }} />
-              <Tooltip content={<CustomTooltip />} wrapperStyle={{ outline: "none" }} cursor={{ fill: "rgba(0,0,0,0.04)", radius: 4 }} />
+              <Tooltip content={<CustomTooltip />} wrapperStyle={{ outline: "none" }} cursor={{ fill: "rgba(255,255,255,0.06)", radius: 4 }} />
               <Bar dataKey="sessions" radius={[0, 6, 6, 0]} animationBegin={200} animationDuration={600} barSize={24}>
                 {chartData.map((entry) => (
                   <Cell key={entry.stack} fill={entry.fill} />
