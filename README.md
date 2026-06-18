@@ -1,8 +1,8 @@
-# Interview Prep App
+# InterviewKit
 
-> Aplicación interactiva para reforzar el estudio de entrevistas técnicas de desarrollo web.
+> Simula entrevistas técnicas con IA. Elige tu stack, responde preguntas y repasa con cards personalizadas.
 
-[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3-000000?style=flat&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat&logo=next.js&logoColor=white)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=flat&logo=react&logoColor=white)](https://react.dev)
@@ -13,7 +13,21 @@
 
 ## Descripción
 
-**Interview Prep App** es una plataforma interactiva para que desarrolladores web practiquen entrevistas técnicas. Permite seleccionar tu rol (*Frontend* / *Backend*), tecnologías y nivel de dificultad, y genera preguntas personalizadas vía IA para simular entrevistas reales.
+**InterviewKit** es una plataforma para que desarrolladores practiquen entrevistas técnicas. Seleccionas tu rol (Frontend/Backend), la tecnología y el nivel, y la IA genera 5 preguntas personalizadas. Recibes feedback instantáneo y cada pregunta se guarda como una card Q&A para repasar.
+
+---
+
+## Funcionalidades
+
+- **Login con Google y GitHub** — OAuth 2.0 con vinculación automática por email
+- **Registro con email/password** — bcrypt + JWT en httpOnly cookies
+- **Entrevistas con IA** — Generación de preguntas vía Groq API adaptadas a rol, stack y nivel
+- **Feedback instantáneo** — Evaluación de cada respuesta con explicación detallada
+- **Cards Q&A** — Cada pregunta se guarda con respuesta explicada para repaso
+- **Dashboard** — Busca, filtra y edita tus cards guardadas
+- **Sistema de XP y niveles** — Gana XP con cada sesión, sube de nivel, trackea tu progreso
+- **Estadísticas** — Gráficos de resultados, sesiones recientes, tags más practicados
+- **Landing page dark theme** — Diseño oscuro/tecnológico con animaciones
 
 ---
 
@@ -27,56 +41,57 @@
 | Animaciones | Framer Motion |
 | Backend | Flask 3 (Python) |
 | ORM | SQLAlchemy + Flask-Migrate (Alembic) |
-| Auth | JWT + bcrypt |
+| Auth | JWT + bcrypt + OAuth 2.0 (Google, GitHub) |
+| OAuth | Authlib |
 | Estado global | React Context (AuthContext) |
 | IA | Groq API |
-| Base de datos (dev) | PostgreSQL 16 (Docker) |
-| Base de datos (prod) | PostgreSQL (Fly.io) |
-| Deploy | Vercel |
+| Base de datos | PostgreSQL 16 |
+| Deploy frontend | Vercel |
+| Deploy backend | Fly.io |
 
 ---
 
-## Funcionalidades y Arquitectura
+## Auth y OAuth
 
-### Sistema de Autenticación
+La autenticación soporta dos flujos:
 
-La autenticación se implementa mediante **JWT** con `Flask-JWT-Extended` en el backend. El frontend gestiona el estado de sesión globalmente a través de `AuthContext` (`frontend/src/context/AuthContext.jsx`), permitiendo registro, inicio de sesión y protección de rutas de forma centralizada.
+1. **Email/password** — Registro e inicio de sesión clásico con bcrypt + JWT en httpOnly cookies.
+2. **OAuth (Google, GitHub)** — Login social con `Authlib`. Si el email ya existe, se vincula automáticamente a la cuenta existente.
 
-### Rutas Protegidas
+Flujo OAuth:
 
-El grupo de rutas `(protected)` dentro del **App Router** de Next.js envuelve las páginas de `dashboard` y `session`, asegurando que solo usuarios autenticados puedan acceder a ellas. Las rutas públicas (`login`, `register`, `home`) permanecen en el grupo `(app)`.
+```
+Frontend (botón) → GET /auth/google → Redirect a Google
+→ Usuario autoriza → Callback en Backend
+→ Buscar/crear usuario → Set JWT cookie → Redirect al Frontend /auth/callback
+→ Frontend: GET /me/profile → populate AuthContext
+```
 
-### Simulador de Entrevistas
+Modelo de datos:
 
-La página `/session` permite al usuario configurar una entrevista técnica seleccionando rol, stack tecnológico y nivel de dificultad. Las preguntas se generan en tiempo real mediante la **Groq API**, ofreciendo una experiencia personalizada y realista.
-
-### UI System
-
-El sistema de interfaz está construido sobre **Shadcn/ui** con **Radix UI** como base de accesibilidad, estilizado con **Tailwind CSS v4** e iconos de **Lucide React**. Las animaciones y transiciones se manejan con **Framer Motion** para micro-interacciones fluidas.
+- `User` — `user_id`, `name`, `email`, `password` (nullable para OAuth-only), `total_xp`, `level`
+- `OAuthAccount` — `id`, `user_id` (FK), `provider` (google/github), `provider_user_id`
 
 ---
 
-## Capturas
+## Rutas Protegidas
 
-> ![App screenshot](docs/screenshot.png)
-> *Próximamente — captura de la aplicación en funcionamiento.*
+El grupo `(protected)` envuelve las páginas que requieren autenticación (`dashboard`, `session`, `stats`, `profile`). Las rutas públicas (`/`, `/login`, `/register`, `/auth/callback`) permanecen abiertas.
+
+`AuthContext` verifica la sesión al montar la app (`GET /me/stats`) y redirige a `/` si no hay usuario.
 
 ---
 
 ## Prerrequisitos
 
-Instalar antes de empezar. Solo se hace una vez.
-
 - [Node.js](https://nodejs.org/) v18+
-- [Python](https://www.python.org/) 3.11+
+- [Python](https://www.python.org/) 3.12+
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - Git
 
 ---
 
 ## Setup inicial
-
-Pasos para tener el proyecto corriendo por primera vez.
 
 ### 1. Clonar el repositorio
 
@@ -103,7 +118,7 @@ pip install -r requirements.txt
 
 # Configurar variables de entorno
 cp .env.example .env
-# Edita .env con tus valores
+# Edita .env con tus valores (GROQ_API_KEY, JWT_SECRET_KEY, etc.)
 ```
 
 ### 3. Base de datos (Docker)
@@ -116,7 +131,6 @@ docker compose up -d
 
 ```bash
 # Desde /backend con el venv activado
-flask db migrate
 flask db upgrade
 ```
 
@@ -128,14 +142,12 @@ npm install
 
 # Configurar variables de entorno
 cp .env.example .env
-# Edita .env con tus valores
+# Edita .env con NEXT_PUBLIC_API_URL=http://localhost:5000
 ```
 
 ---
 
 ## Desarrollo local
-
-Comandos del día a día una vez tienes el setup hecho.
 
 ### Arrancar la base de datos
 
@@ -147,12 +159,8 @@ docker compose up -d
 
 ```bash
 cd backend
-
-# Mac/Linux:
-source venv/bin/activate
-# Windows:
-venv\Scripts\activate
-
+# Mac/Linux: source venv/bin/activate
+# Windows: venv\Scripts\activate
 flask run
 ```
 
@@ -181,52 +189,43 @@ docker compose down
 interview-prep-app/
 ├── backend/
 │   ├── app/
-│   │   ├── models/       # Modelos SQLAlchemy (User)
-│   │   ├── routes/       # Endpoints API (auth, main)
-│   │   ├── services/     # Lógica de negocio e integración con Groq IA
-│   │   ├── __init__.py   # Fábrica de la app Flask
-│   │   └── config.py     # Configuración desde variables de entorno
-│   ├── migrations/       # Migraciones Alembic
+│   │   ├── models/          # User, Session, Question, Card, OAuthAccount
+│   │   ├── routes/          # auth, oauth, sessions, cards, user, stacks, debug
+│   │   ├── services/        # Lógica de negocio e integración con Groq
+│   │   ├── constants/       # Configuración de gamificación
+│   │   ├── __init__.py      # Fábrica de la app Flask + OAuth init
+│   │   └── config.py        # Configuración desde variables de entorno
+│   ├── migrations/          # Migraciones Alembic
 │   ├── requirements.txt
-│   └── run.py            # Punto de entrada
+│   ├── Dockerfile
+│   ├── fly.toml
+│   └── run.py
 ├── frontend/
-│   ├── app/              # Next.js App Router
-│   │   ├── (app)/        # Grupo de rutas públicas
-│   │   │   ├── login/    # Página de inicio de sesión
-│   │   │   ├── register/ # Página de registro de usuario
-│   │   │   └── page.jsx  # Landing / Home
-│   │   ├── (protected)/  # Grupo de rutas protegidas (requieren auth)
-│   │   │   ├── dashboard/# Panel de control del usuario
-│   │   │   └── session/  # Simulador de entrevista técnica
-│   │   └── layout.js     # Layout raíz de la aplicación
+│   ├── app/
+│   │   ├── (app)/
+│   │   │   ├── page.jsx          # Landing page
+│   │   │   ├── login/            # Login con OAuth + email
+│   │   │   ├── register/         # Registro con OAuth + email
+│   │   │   ├── auth/callback/    # OAuth callback handler
+│   │   │   └── (protected)/
+│   │   │       ├── dashboard/    # Cards del usuario
+│   │   │       ├── session/      # Simulador de entrevista
+│   │   │       ├── stats/        # Estadísticas y gráficos
+│   │   │       └── profile/     # Perfil y XP
+│   │   └── layout.js
 │   ├── src/
-│   │   ├── components/   # Componentes reutilizables (Navbar, Footer, StackSelector)
-│   │   ├── components/ui/# Componentes Shadcn/ui (Button, Card, Input, etc.)
-│   │   ├── context/      # AuthContext — gestión global de sesión
-│   │   ├── data/         # Datos estáticos (stacks de tecnología)
-│   │   ├── lib/          # Utilidades (cn, helpers)
-│   │   └── services/     # Llamadas a la API backend
+│   │   ├── components/       # Navbar, Footer, OAuthButtons, StackSelector
+│   │   ├── components/home/  # Hero, Features, HowItWorks, Techs, FAQ, CTA
+│   │   ├── components/ui/   # Shadcn/ui (Button, Card, Input, Dialog, etc.)
+│   │   ├── context/          # AuthContext — gestión global de sesión
+│   │   ├── data/             # Datos estáticos
+│   │   ├── lib/              # Utilidades (cn)
+│   │   └── services/         # Llamadas a la API
 │   ├── public/
-│   ├── package.json
-│   └── next.config.mjs
-├── docker-compose.yml    # PostgreSQL local
+│   └── package.json
+├── docker-compose.yml
 └── README.md
 ```
-
----
-
-## Scripts útiles
-
-| Comando | Descripción |
-| --- | --- |
-| `docker compose up -d` | Iniciar PostgreSQL |
-| `docker compose down` | Detener PostgreSQL |
-| `cd backend && flask run` | Iniciar backend (puerto 5000) |
-| `cd frontend && npm run dev` | Iniciar frontend Next.js (puerto 3000) |
-| `cd frontend && npm run build` | Build de producción (Next.js) |
-| `cd frontend && npm run lint` | Lint del código (Next.js ESLint) |
-| `cd backend && flask db migrate` | Crear nueva migración Alembic |
-| `cd backend && flask db upgrade` | Aplicar migraciones pendientes |
 
 ---
 
@@ -238,7 +237,16 @@ interview-prep-app/
 GROQ_API_KEY=
 JWT_SECRET_KEY=
 DATABASE_URL=postgresql://admin:admin@localhost:5432/interview_prep
-FLASK_ENV=
+FLASK_ENV=development
+
+# OAuth
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+
+CORS_ORIGINS=http://localhost:3000
+FRONTEND_URL=http://localhost:3000
 ```
 
 ### Frontend (`frontend/.env`)
@@ -246,6 +254,44 @@ FLASK_ENV=
 ```
 NEXT_PUBLIC_API_URL=http://localhost:5000
 ```
+
+---
+
+## Scripts útiles
+
+| Comando | Descripción |
+| --- | --- |
+| `docker compose up -d` | Iniciar PostgreSQL |
+| `docker compose down` | Detener PostgreSQL |
+| `cd backend && flask run` | Iniciar backend (puerto 5000) |
+| `cd frontend && npm run dev` | Iniciar frontend (puerto 3000) |
+| `cd frontend && npm run build` | Build de producción |
+| `cd frontend && npm run lint` | Lint con ESLint |
+| `cd backend && flask db migrate` | Crear migración Alembic |
+| `cd backend && flask db upgrade` | Aplicar migraciones |
+
+---
+
+## Deploy
+
+### Backend (Fly.io)
+
+```bash
+cd backend
+fly deploy
+```
+
+Las migraciones se ejecutan automáticamente (`release_command` en `fly.toml`).
+
+Las variables de entorno sensibles (OAuth secrets, JWT key, etc.) se configuran con:
+
+```bash
+fly secrets set GOOGLE_CLIENT_ID=... GOOGLE_CLIENT_SECRET=...
+```
+
+### Frontend (Vercel)
+
+Push a `main` despliega automáticamente. Las variables de entorno se configuran en el dashboard de Vercel.
 
 ---
 
@@ -258,20 +304,6 @@ main        → producción, siempre deployable
 dev         → integración, aquí se mergean las features
 feature/xxx → trabajo individual
 fix/xxx     → corrección de bugs
-```
-
-### Flujo de trabajo
-
-```bash
-# Antes de empezar cualquier tarea
-git checkout dev
-git pull origin dev
-git checkout -b feature/nombre-descriptivo
-
-# Cuando terminas
-# Abre un PR hacia dev en GitHub
-# Mínimo 1 review de otro miembro antes de mergear
-# Nunca se pushea directamente a main
 ```
 
 ### Convención de commits
