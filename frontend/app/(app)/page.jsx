@@ -1,11 +1,10 @@
 "use client";
-
-import { Button } from "@/components/ui/button";
-import CTA from "@/components/home/cta";
-import Features from "@/components/home/features";
 import Hero from "@/components/home/hero";
+import Features from "@/components/home/features";
 import HowItWorks from "@/components/home/howitworks";
 import Techs from "@/components/home/techs";
+import Faq from "@/components/home/faq";
+import CTA from "@/components/home/cta";
 
 export default function HomePage() {
   return (
@@ -14,8 +13,8 @@ export default function HomePage() {
       <Techs />
       <HowItWorks />
       <Features />
-      <CTA/>
+      <Faq />
+      <CTA />
     </div>
-    
-  )
+  );
 }

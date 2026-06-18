@@ -1,36 +1,42 @@
 "use client";
 
-import { motion } from "framer-motion"
-import { useRouter} from "next/navigation"
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 
 export default function CTA() {
+  const router = useRouter();
 
-    const router = useRouter()
-
-    return (
-    <motion.section
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-200px" }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full px-6 py-20 bg-white flex flex-col items-center text-center"
-    >
-
-      <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 max-w-md">
-        ¿Listo para tu próxima entrevista?
-      </h2>
-
-      <p className="text-gray-400 text-base sm:text-lg max-w-md mb-8 leading-relaxed">
-        Configura tu sesión en segundos y empieza a practicar ahora.
-      </p>
-
-      <button
-        onClick={() => router.push("/register")}
-        className="px-10 py-4 rounded-2xl bg-gray-900 text-white text-base font-medium hover:bg-gray-700 transition-colors"
+  return (
+    <section className="w-full px-6 py-24 sm:py-32">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6 }}
+        className="relative max-w-4xl mx-auto rounded-3xl border border-border bg-card overflow-hidden"
       >
-        Empezar ahora
-      </button>
+        {/* Glow effect */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[250px] bg-primary/10 rounded-full blur-3xl" />
 
-    </motion.section>
+        <div className="relative z-10 flex flex-col items-center text-center px-8 py-16 sm:py-20">
+          <h2 className="text-3xl sm:text-5xl font-bold text-foreground mb-4 tracking-tight max-w-lg">
+            ¿Listo para tu próxima entrevista?
+          </h2>
+          <p className="text-muted-foreground text-lg mb-10 max-w-md leading-relaxed">
+            Configura tu sesión en segundos y empieza a practicar con IA ahora.
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => router.push("/register")}
+            className="group inline-flex items-center gap-3 px-8 py-4 rounded-xl bg-primary text-primary-foreground text-base font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-shadow cursor-pointer"
+          >
+            <span>Empezar ahora</span>
+            <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
+          </motion.button>
+        </div>
+      </motion.div>
+    </section>
   );
 }
