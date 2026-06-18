@@ -15,20 +15,20 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/context/AuthContext"
 import { updateProfile } from "@/services/profileService"
 
-export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName, profile, setProfile}) {
-  const [newName, setNewName] = useState(profile?.name || "")
+export function ChangeUserName({isOpenChangeUserName, setIsOpenChangeUserName}) {
+  const { user, updateUser, refreshStats } = useAuth()
+  const [newName, setNewName] = useState(user || "")
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
-  const { updateUser } = useAuth()
 
   const handleSave = async () => {
     if (!newName.trim()) return
     setSaving(true)
     setError(null)
     try {
-      const data = await updateProfile(newName.trim())
-      setProfile({ ...profile, name: data.name })
-      updateUser(data.name)
+      await updateProfile(newName.trim())
+      updateUser(newName.trim())
+      await refreshStats()
       setIsOpenChangeUserName(false)
     } catch (err) {
       setError(err.message)

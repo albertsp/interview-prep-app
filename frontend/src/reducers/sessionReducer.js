@@ -27,7 +27,11 @@ export const initialState = {
   // Nivel del usuario tras esta sesion
   sessionLevel: 1,
   // XP que faltan para el siguiente nivel tras esta sesion
-  sessionXpToNextLevel: 500,
+  sessionXpToNextLevel: 0,
+  // Progress dentro del nivel actual (XP desde el inicio del nivel)
+  sessionProgressInLevel: 0,
+  // XP necesarios por nivel (del backend)
+  sessionXpPerLevel: 0,
   // Si se aplico el bonus por completar todas las preguntas
   sessionBonusApplied: false,
   // Si el /complete ya se llamo y devolvio datos
@@ -64,7 +68,9 @@ export function sessionReducer(state, action) {
         sessionXpEarned: 0,
         sessionTotalXp: 0,
         sessionLevel: 1,
-        sessionXpToNextLevel: 500,
+        sessionXpToNextLevel: 0,
+        sessionProgressInLevel: 0,
+        sessionXpPerLevel: 0,
         sessionBonusApplied: false,
         sessionCompleteLoaded: false,
         error: null,
@@ -176,7 +182,7 @@ export function sessionReducer(state, action) {
 
     // Guarda el resultado de POST /sessions/<id>/complete
     case "SESSION_COMPLETED": {
-      const { xp_earned, total_xp, level, xp_to_next_level, bonus_applied } = action.payload;
+      const { xp_earned, total_xp, level, xp_to_next_level, progress_in_level, xp_per_level, bonus_applied } = action.payload;
       return {
         ...state,
         currentPhase: "complete",
@@ -185,7 +191,9 @@ export function sessionReducer(state, action) {
         sessionXpEarned: xp_earned ?? 0,
         sessionTotalXp: total_xp ?? 0,
         sessionLevel: level ?? 1,
-        sessionXpToNextLevel: xp_to_next_level ?? 500,
+        sessionXpToNextLevel: xp_to_next_level ?? 0,
+        sessionProgressInLevel: progress_in_level ?? 0,
+        sessionXpPerLevel: xp_per_level ?? 0,
         sessionBonusApplied: !!bonus_applied,
         sessionCompleteLoaded: true,
       };

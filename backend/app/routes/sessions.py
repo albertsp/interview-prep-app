@@ -156,6 +156,8 @@ def complete_session(session_id):
     user_session.is_completed = True
     db.session.commit()
 
+    progress_in_level = max(0, user.total_xp - ((user.level - 1) * XP_PER_LEVEL))
+
     return jsonify({
         "session_id": session_id,
         "xp_earned": xp_earned,
@@ -163,5 +165,7 @@ def complete_session(session_id):
         "total_xp": user.total_xp,
         "level": user.level,
         "xp_to_next_level": xp_to_next_level(user.total_xp),
+        "progress_in_level": progress_in_level,
+        "xp_per_level": XP_PER_LEVEL,
         "breakdown": breakdown,
     }), 200
