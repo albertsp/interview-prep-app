@@ -20,14 +20,13 @@ export default function SessionComplete({
   totalXp = 0,
   level = 1,
   xpToNextLevel = 0,
+  xpPerLevel = 500,
+  progressInLevel = 0,
   bonusApplied = false,
   loading = true,
 }) {
-  // Porcentaje de progreso al siguiente nivel tras la sesion
-  const xpPerLevel = 500;
-  const progressInLevel = totalXp - (level - 1) * xpPerLevel;
-  const progressPct = totalXp > 0
-    ? Math.min(100, Math.round((progressInLevel / xpPerLevel) * 100))
+  const progressPct = xpPerLevel > 0
+    ? Math.min(100, Math.max(0, Math.round((progressInLevel / xpPerLevel) * 100)))
     : 0;
 
   return (

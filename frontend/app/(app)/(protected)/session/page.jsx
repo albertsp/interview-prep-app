@@ -202,6 +202,8 @@ export default function SessionPage() {
               totalXp={state.sessionTotalXp}
               level={state.sessionLevel}
               xpToNextLevel={state.sessionXpToNextLevel}
+              xpPerLevel={state.sessionXpPerLevel}
+              progressInLevel={state.sessionProgressInLevel}
               bonusApplied={state.sessionBonusApplied}
               loading={!state.sessionCompleteLoaded}
             />

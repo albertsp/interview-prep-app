@@ -10,9 +10,9 @@ const AuthContext = createContext()
 const DEFAULT_STATS = {
   total_xp: 0,
   level: 1,
-  xp_to_next_level: 500,
+  xp_to_next_level: 0,
   progress_in_level: 0,
-  xp_per_level: 500,
+  xp_per_level: 0,
   results_summary: { correct: 0, partially_correct: 0, incorrect: 0 },
   stacks_stats: [],
   sessions_count: 0,
@@ -44,9 +44,9 @@ export function AuthProvider({children}){
             setStats({
                 total_xp: data.total_xp ?? 0,
                 level: data.level ?? 1,
-                xp_to_next_level: data.xp_to_next_level ?? 500,
+                xp_to_next_level: data.xp_to_next_level ?? 0,
                 progress_in_level: data.progress_in_level ?? 0,
-                xp_per_level: data.xp_per_level ?? 500,
+                xp_per_level: data.xp_per_level ?? 0,
                 results_summary: data.results_summary ?? DEFAULT_STATS.results_summary,
                 stacks_stats: data.stacks_stats ?? DEFAULT_STATS.stacks_stats,
                 sessions_count: data.sessions_count ?? DEFAULT_STATS.sessions_count,
