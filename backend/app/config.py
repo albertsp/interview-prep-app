@@ -14,6 +14,8 @@ def _get_database_url():
 
 class Config:
     SQLALCHEMY_DATABASE_URI = _get_database_url()
+    SECRET_KEY = os.getenv("SECRET_KEY", os.getenv("JWT_SECRET_KEY", "dev-secret-key"))
+
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
     if not JWT_SECRET_KEY:
         raise RuntimeError("JWT_SECRET_KEY es obligatorio. Definir en .env o variables de entorno.")
@@ -31,12 +33,18 @@ class Config:
 
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+
+    GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+    GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+
     # Orígenes permitidos por CORS, separados por comas.
     # Ejemplo dev: "http://localhost:3000"
     # Ejemplo prod: "https://tu-app.vercel.app,https://*.vercel.app"
     CORS_ORIGINS = os.getenv("CORS_ORIGINS", "")
 
-    # URL publica del frontend (para futuros enlaces en emails, OG tags, etc.)
+    # URL publica del frontend (para redirigir tras OAuth)
     FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 
     # Modo de la app: "development" | "production" | "test"

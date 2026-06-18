@@ -1,4 +1,6 @@
 alembic==1.18.4
+Authlib==1.6.0
+requests==2.32.4
 annotated-types==0.7.0
 anyio==4.13.0
 bcrypt==5.0.0

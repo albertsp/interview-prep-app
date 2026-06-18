@@ -1,5 +1,12 @@
 import { apiFetch, handleResponse } from "./httpClient";
 
+export async function getMyProfile() {
+  const response = await apiFetch("/me/profile", {
+    method: "GET",
+  });
+  return handleResponse(response);
+}
+
 export async function loginUser(email, password) {
   const response = await apiFetch("/auth/login", {
     method: "POST",

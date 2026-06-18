@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { registerUser } from "@/services/authService";
 import { UserPlus, Mail, Lock, User, ArrowRight } from "lucide-react";
+import { OAuthButtons } from "@/components/OAuthButtons";
 
 export default function RegisterPage() {
   // Estados locales para el formulario de registro
@@ -80,7 +81,9 @@ export default function RegisterPage() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <OAuthButtons dividerLabel="o registrate con email" />
+
+            <form onSubmit={handleSubmit} className="mt-6 space-y-5">
               {/* Name */}
               <div className="space-y-2">
                 <Label htmlFor="register-name">Nombre</Label>

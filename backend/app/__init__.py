@@ -4,6 +4,7 @@ from .config import Config
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
+from authlib.integrations.flask_client import OAuth
 
 
 # Creamos la clase SQLAlchemy y JWTManager para integrar con Flask
@@ -22,7 +23,9 @@ def create_app():
     from .models.session import Session
     from .models.question import Question
     from .models.card import Card
+    from .models.oauth_account import OAuthAccount
     from .routes.auth import auth
+    from .routes.oauth import oauth_bp, oauth
     from .routes.stacks import stacks
     from .routes.sessions import sessions
     from .routes.cards import cards
@@ -31,6 +34,34 @@ def create_app():
 
     Migrate(app, db)                    # Habilita migraciones de base de datos con Flask
 
+    # OAuth: registrar providers solo si estan configuradas las credenciales
+    has_oauth_provider = (
+        (app.config.get("GOOGLE_CLIENT_ID") and app.config.get("GOOGLE_CLIENT_SECRET"))
+        or (app.config.get("GITHUB_CLIENT_ID") and app.config.get("GITHUB_CLIENT_SECRET"))
+    )
+
+    if has_oauth_provider:
+        oauth.init_app(app)
+
+        if app.config.get("GOOGLE_CLIENT_ID") and app.config.get("GOOGLE_CLIENT_SECRET"):
+            oauth.register(
+                name="google",
+                client_id=app.config["GOOGLE_CLIENT_ID"],
+                client_secret=app.config["GOOGLE_CLIENT_SECRET"],
+                server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+                client_kwargs={"scope": "openid email profile"},
+            )
+
+        if app.config.get("GITHUB_CLIENT_ID") and app.config.get("GITHUB_CLIENT_SECRET"):
+            oauth.register(
+                name="github",
+                client_id=app.config["GITHUB_CLIENT_ID"],
+                client_secret=app.config["GITHUB_CLIENT_SECRET"],
+                access_token_url="https://github.com/login/oauth/access_token",
+                authorize_url="https://github.com/login/oauth/authorize",
+                api_base_url="https://api.github.com/",
+                client_kwargs={"scope": "user:email"},
+            )
 
     
     # CORS: orígenes permitidos según entorno.
@@ -58,6 +89,7 @@ def create_app():
 
 
     app.register_blueprint(auth)
+    app.register_blueprint(oauth_bp)
     app.register_blueprint(stacks)
     app.register_blueprint(sessions)
     app.register_blueprint(cards)
@@ -65,4 +97,3 @@ def create_app():
     app.register_blueprint(debug)
 
     return app
-
