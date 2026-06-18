@@ -5,6 +5,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from authlib.integrations.flask_client import OAuth
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 # Creamos la clase SQLAlchemy y JWTManager para integrar con Flask
@@ -15,6 +16,9 @@ jwt = JWTManager()
 def create_app():
     app = Flask(__name__)               # Instancia inicial para Flask
     app.config.from_object(Config)      # Pasamos parametros de configuracion
+
+    # Corregir URLs detras de proxy (Fly.io terminateda SSL)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
     db.init_app(app)                    # Inicializamos app Flask con la extension SQLAlchemy
     jwt.init_app(app)                   # Inicializamos app Flask con extension JTManager

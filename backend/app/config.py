@@ -50,6 +50,9 @@ class Config:
     # Modo de la app: "development" | "production" | "test"
     FLASK_ENV = os.getenv("FLASK_ENV", "production")
 
+    # En produccion detras de proxy, forzar HTTPS en las URLs generadas
+    PREFERRED_URL_SCHEME = "https" if FLASK_ENV == "production" else "http"
+
     @staticmethod
     def parse_cors_origins():
         """Convierte 'a,b,c' en ['a','b','c']. Si esta vacio, devuelve lista vacia."""
