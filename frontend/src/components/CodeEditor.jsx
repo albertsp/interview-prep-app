@@ -9,7 +9,7 @@ import { python } from "@codemirror/lang-python";
 import { closeBrackets } from "@codemirror/autocomplete";
 import { oneDark } from "@codemirror/theme-one-dark";
 
-export default function CodeEditor({ value, onChange, placeholder = "" }) {
+export default function CodeEditor({ value, onChange, placeholder = "", ariaLabel = "Editor de codigo" }) {
   const editorRef = useRef(null);
   const viewRef = useRef(null);
 
@@ -97,5 +97,5 @@ export default function CodeEditor({ value, onChange, placeholder = "" }) {
     }
   }, [value]);
 
-  return <div ref={editorRef} className="w-full" />;
+  return <div ref={editorRef} className="w-full" role="textbox" aria-label={ariaLabel} aria-multiline="true" />;
 }

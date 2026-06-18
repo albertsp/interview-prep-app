@@ -92,7 +92,7 @@ export default function SessionPage() {
         code_language: state.card.code_language,
       });
     } catch (err) {
-      alert("Error al guardar la card: " + err.message);
+      dispatch({ type: "SET_ERROR", payload: "Error al guardar la card: " + err.message });
       return;
     }
 

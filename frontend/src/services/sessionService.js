@@ -1,22 +1,18 @@
-import { API_URL, headers, handleResponse } from "./httpClient";
+import { apiFetch, handleResponse } from "./httpClient";
 
 export async function createSession({ stack, level }) {
-  const response = await fetch(`${API_URL}/sessions/`, {
+  const response = await apiFetch("/sessions/", {
     method: "POST",
-    headers: headers(),
-    credentials: "include",
     body: JSON.stringify({ stack, level }),
   });
   return handleResponse(response);
 }
 
 export async function submitAnswer(sessionId, questionId, answer) {
-  const response = await fetch(
-    `${API_URL}/sessions/${sessionId}/questions/${questionId}`,
+  const response = await apiFetch(
+    `/sessions/${sessionId}/questions/${questionId}`,
     {
       method: "PATCH",
-      headers: headers(),
-      credentials: "include",
       body: JSON.stringify({ answer }),
     }
   );
@@ -24,19 +20,15 @@ export async function submitAnswer(sessionId, questionId, answer) {
 }
 
 export async function completeSession(sessionId) {
-  const response = await fetch(`${API_URL}/sessions/${sessionId}/complete`, {
+  const response = await apiFetch(`/sessions/${sessionId}/complete`, {
     method: "POST",
-    headers: headers(),
-    credentials: "include",
   });
   return handleResponse(response);
 }
 
 export async function getMyStats() {
-  const response = await fetch(`${API_URL}/me/stats`, {
+  const response = await apiFetch("/me/stats", {
     method: "GET",
-    headers: headers(),
-    credentials: "include",
   });
   return handleResponse(response);
 }
@@ -54,10 +46,8 @@ export async function saveCard({
   code,
   code_language,
 }) {
-  const response = await fetch(`${API_URL}/cards/`, {
+  const response = await apiFetch("/cards/", {
     method: "POST",
-    headers: headers(),
-    credentials: "include",
     body: JSON.stringify({
       question_id,
       session_id,

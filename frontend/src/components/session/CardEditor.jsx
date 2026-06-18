@@ -228,6 +228,7 @@ function CardEdit({ card, onChange }) {
           onChange={(e) => updateField("explanation", e.target.value)}
           rows={3}
           placeholder="Aclaracion profunda del concepto..."
+          aria-label="Explicacion del concepto"
           className={cn(
             "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-y transition-colors outline-none",
             "placeholder:text-muted-foreground",
@@ -247,6 +248,7 @@ function CardEdit({ card, onChange }) {
           onChange={(e) => updateField("use_case", e.target.value)}
           rows={2}
           placeholder="Caso de uso practico..."
+          aria-label="Caso de uso"
           className={cn(
             "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-y transition-colors outline-none",
             "placeholder:text-muted-foreground",
@@ -269,6 +271,7 @@ function CardEdit({ card, onChange }) {
           onChange={(e) => updateField("avoid_when", e.target.value)}
           rows={2}
           placeholder="Cuando NO usarlo..."
+          aria-label="Evitar cuando"
           className={cn(
             "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-y transition-colors outline-none",
             "placeholder:text-muted-foreground",
@@ -284,10 +287,12 @@ function CardEdit({ card, onChange }) {
             Codigo
           </Label>
           <div className="flex items-center gap-2">
-            <Label className="text-xs text-muted-foreground">Lenguaje:</Label>
+            <Label htmlFor="code-language-select" className="text-xs text-muted-foreground">Lenguaje:</Label>
             <select
               value={card.code_language || "javascript"}
               onChange={(e) => updateField("code_language", e.target.value)}
+              id="code-language-select"
+              aria-label="Lenguaje de programacion"
               className="px-2 py-1 rounded-md border border-input bg-background text-xs outline-none focus-visible:border-ring"
             >
               {LANGUAGE_OPTIONS.map((opt) => (

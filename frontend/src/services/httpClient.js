@@ -4,8 +4,10 @@ export function headers() {
   return { "Content-Type": "application/json" };
 }
 
-export function authHeaders() {
-  return { "Content-Type": "application/json" };
+let onUnauthorizedCallback = null;
+
+export function setOnUnauthorized(cb) {
+  onUnauthorizedCallback = cb;
 }
 
 export async function handleResponse(response) {
@@ -14,6 +16,9 @@ export async function handleResponse(response) {
   }
 
   if (response.status === 401) {
+    if (onUnauthorizedCallback) {
+      onUnauthorizedCallback();
+    }
     throw new Error("Sesion expirada. Por favor, inicia sesion de nuevo.");
   }
 

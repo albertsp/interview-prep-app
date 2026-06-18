@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Pencil, Mail, Trophy, Star } from 'lucide-react';
 import { useAuth } from "@/context/AuthContext";
-import { API_URL, handleResponse } from "@/services/httpClient";
+import { getProfile } from "@/services/profileService";
 
 import {
     Card,
@@ -31,29 +31,60 @@ export default function ProfilePage() {
     const { user } = useAuth();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [isOpenChangeUserName, setIsOpenChangeUserName] = useState(false);
 
-    const getProfile = async () => {
-        if (!user) return;
-        try {
-            const data = await handleResponse(
-                await fetch(`${API_URL}/me/profile`, {
-                    method: 'GET',
-                    credentials: 'include',
-                })
-            );
-            setProfile(data);
-        } catch {
-            // Si falla, mantenemos el estado anterior
-        }
-        setLoading(false);
-    }
-
     useEffect(() => {
+        if (!user) return
+        let cancelled = false
+        setLoading(true)
         getProfile()
+            .then((data) => {
+                if (!cancelled) setProfile(data)
+            })
+            .catch((err) => {
+                if (!cancelled) setError(err.message)
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false)
+            })
+        return () => { cancelled = true }
     }, [user]);
 
-    if (loading) return null;
+    if (loading) {
+        return (
+            <div className="flex min-h-[80vh] bg-slate-50 items-center justify-center p-4">
+                <div className="w-full max-w-md">
+                    <div className="animate-pulse space-y-6">
+                        <div className="mx-auto h-52 w-52 bg-muted rounded-full" />
+                        <div className="h-6 bg-muted rounded w-3/4 mx-auto" />
+                        <div className="h-3 bg-muted rounded w-1/2 mx-auto" />
+                        <div className="h-3 bg-muted rounded-full" />
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="h-24 bg-muted rounded" />
+                            <div className="h-24 bg-muted rounded" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="flex min-h-[80vh] bg-slate-50 items-center justify-center p-4">
+                <div className="text-center">
+                    <p className="text-destructive text-lg font-medium">{error}</p>
+                    <button
+                        onClick={() => { setError(null); getProfile().then(setProfile).catch(() => {}) }}
+                        className="mt-4 text-primary underline"
+                    >
+                        Reintentar
+                    </button>
+                </div>
+            </div>
+        )
+    }
 
     const progressPercent = profile
         ? Math.min(100, (profile.progress_in_level / profile.xp_per_level) * 100)
@@ -80,9 +111,9 @@ export default function ProfilePage() {
                                     {profile?.name?.split(' ').map(n => n[0]).join('') || "U"}
                                 </AvatarFallback>
                             </Avatar>
-                            <label className="absolute bottom-2 right-2 flex size-9 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors">
+                            <label className="absolute bottom-2 right-2 flex size-9 cursor-pointer items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors" aria-label="Cambiar foto de perfil">
                                 <Camera className="size-4" />
-                                <input type="file" accept="image/*" className="hidden" />
+                                <input type="file" accept="image/*" className="hidden" aria-hidden="true" />
                             </label>
                         </div>
                     </motion.div>
@@ -94,7 +125,7 @@ export default function ProfilePage() {
                                 <h1 className="text-2xl font-bold tracking-tight text-foreground">
                                     {profile?.name || "Usuario"}
                                 </h1>
-                                <button onClick={() => setIsOpenChangeUserName(true)} className="flex size-7 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                                <button onClick={() => setIsOpenChangeUserName(true)} className="flex size-7 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" aria-label="Editar nombre de usuario">
                                     <Pencil className="size-3.5" />
                                 </button>
                             </div>

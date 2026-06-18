@@ -74,6 +74,7 @@ export default function QuestionPhase({
           value={answer}
           onChange={onAnswerChange}
           placeholder="Escribe tu codigo aqui..."
+          ariaLabel="Editor de codigo para tu respuesta"
         />
       ) : (
         <textarea
@@ -86,6 +87,7 @@ export default function QuestionPhase({
           placeholder="Escribe tu respuesta aqui..."
           value={answer}
           onChange={(e) => onAnswerChange(e.target.value)}
+          aria-label="Escribe tu respuesta"
         />
       )}
 
