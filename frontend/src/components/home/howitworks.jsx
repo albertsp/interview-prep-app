@@ -1,74 +1,80 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
+import { Settings2, Sparkles, Layers } from "lucide-react";
 
 const STEPS = [
   {
-    number: "1",
+    number: "01",
+    icon: Settings2,
     title: "Configura tu sesión",
-    description: "Elige tu rol, la tecnología que quieres practicar y tu nivel de experiencia.",
+    description: "Elige tu rol, la tecnología y tu nivel de experiencia. La IA se adapta a ti.",
   },
   {
-    number: "2",
-    title: "La IA genera tu examen",
-    description: "En segundos tienes 5 preguntas personalizadas listas para responder.",
+    number: "02",
+    icon: Sparkles,
+    title: "La IA genera tu entrevista",
+    description: "5 preguntas personalizadas en segundos. Como una entrevista real, pero sin presión.",
   },
   {
-    number: "3",
-    title: "Practica con las cards",
-    description: "Revisa cada pregunta con su respuesta explicada, guardada en tu historial.",
+    number: "03",
+    icon: Layers,
+    title: "Repasa con cards",
+    description: "Cada pregunta viene con su respuesta explicada. Guarda, revisa y mejora sesión tras sesión.",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-200px" }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full px-6 py-16 bg-white"
-    >
+    <section className="w-full px-6 py-24 sm:py-32 bg-secondary/30">
+      <div className="max-w-5xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16"
+        >
+          <span className="text-primary font-mono text-sm font-medium tracking-wide uppercase mb-4 block">
+            Cómo funciona
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-bold text-foreground mb-4 tracking-tight">
+            Tres pasos. Una entrevista.
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-md mx-auto">
+            De la configuración al feedback en menos de 5 minutos.
+          </p>
+        </motion.div>
 
-      <div className="text-center mb-10">
-        <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3">
-          Cómo funciona
-        </h2>
-        <p className="text-gray-400 text-base sm:text-lg max-w-md mx-auto">
-          Tres pasos para prepararte para tu próxima entrevista.
-        </p>
-      </div>
+        <div className="relative grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6">
+          {/* Connecting line - hidden on mobile */}
+          <div className="hidden sm:block absolute top-16 left-[16.67%] right-[16.67%] h-px bg-gradient-to-r from-border via-primary/40 to-border" />
 
-      {/* Steps */}
-      <div className="flex flex-col sm:flex-row items-start justify-center gap-8 max-w-3xl mx-auto">
-        {STEPS.map(({ number, title, description }, index) => (
-          <div key={number} className="flex flex-col items-center text-center gap-4 flex-1">
-
-            {/* Number + connector */}
-            <div className="flex items-center w-full justify-center gap-2">
-              {/* Left line */}
-              {index !== 0 && (
-                <div className="hidden sm:block flex-1 h-px bg-gray-200" />
-              )}
-              <div className="w-12 h-12 rounded-full border-2 border-gray-900 bg-white flex items-center justify-center text-base font-bold text-gray-900 shrink-0">
-                {number}
+          {STEPS.map(({ number, icon: Icon, title, description }, index) => (
+            <motion.div
+              key={number}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+              className="flex flex-col items-center text-center gap-5"
+            >
+              <div className="relative">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                  <Icon className="size-6 text-primary" strokeWidth={1.5} />
+                </div>
+                <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center font-mono">
+                  {number}
+                </span>
               </div>
-              {/* Right line */}
-              {index !== STEPS.length - 1 && (
-                <div className="hidden sm:block flex-1 h-px bg-gray-200" />
-              )}
-            </div>
-
-            {/* Text */}
-            <div className="flex flex-col gap-1">
-              <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-              <p className="text-base text-gray-400 leading-relaxed">{description}</p>
-            </div>
-
-          </div>
-        ))}
+              <div>
+                <h3 className="text-lg font-bold text-foreground mb-1.5">{title}</h3>
+                <p className="text-muted-foreground leading-relaxed text-sm">{description}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
-
-    </motion.section>
+    </section>
   );
 }
