@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { getMyStats } from "@/services/sessionService";
+import { getMyProfile } from "@/services/authService";
 import { logoutUser } from "@/services/authService";
 import { setOnUnauthorized } from "@/services/httpClient";
 
@@ -27,7 +28,6 @@ export function AuthProvider({children}){
     const [initialized, setInitialized] = useState(false)
     const refreshingRef = useRef(false)
 
-    // Registrar interceptor 401 para limpiar sesion automaticamente
     useEffect(() => {
         setOnUnauthorized(() => {
             localStorage.removeItem("user")
@@ -54,7 +54,6 @@ export function AuthProvider({children}){
                 cards_summary: data.cards_summary ?? DEFAULT_STATS.cards_summary,
             })
         } catch {
-            // Si falla, mantenemos las stats anteriores
         } finally {
             refreshingRef.current = false
         }
@@ -76,6 +75,14 @@ export function AuthProvider({children}){
         refreshStats()
     }
 
+    async function loginFromOAuth(){
+        const profile = await getMyProfile()
+        const name = profile.name
+        localStorage.setItem("user", name)
+        setUser(name)
+        await refreshStats()
+    }
+
     function updateUser(newName){
         localStorage.setItem("user", newName)
         setUser(newName)
@@ -85,7 +92,6 @@ export function AuthProvider({children}){
         try {
             await logoutUser()
         } catch {
-            // Si falla el logout en backend, igual limpiamos localmente
         }
         localStorage.removeItem("user")
         setUser("")
@@ -93,7 +99,7 @@ export function AuthProvider({children}){
     }
 
     return(
-        <AuthContext.Provider value={{user, stats, initialized, login, logout, refreshStats, updateUser}}>
+        <AuthContext.Provider value={{user, stats, initialized, login, loginFromOAuth, logout, refreshStats, updateUser}}>
             {children}
         </AuthContext.Provider>
     )

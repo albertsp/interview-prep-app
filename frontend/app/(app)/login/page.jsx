@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -11,17 +11,23 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { useAuth } from "@/context/AuthContext";
 import { loginUser } from "@/services/authService";
 import { LogIn, Mail, Lock, ArrowRight } from "lucide-react";
+import { OAuthButtons } from "@/components/OAuthButtons";
 
-export default function LoginPage() {
-  // Estados locales para el formulario de login
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login } = useAuth();
 
-  // Envia las credenciales al backend y guarda la sesion en el contexto de auth
+  const oauthError = searchParams.get("error");
+  const [error, setError] = useState(
+    oauthError === "oauth_failed"
+      ? "No se pudo completar el inicio de sesion con Google. Intenta de nuevo."
+      : null
+  );
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
@@ -78,8 +84,9 @@ export default function LoginPage() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Email */}
+            <OAuthButtons />
+
+            <form onSubmit={handleSubmit} className="mt-6 space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="login-email">Email</Label>
                 <div className="relative">
@@ -95,7 +102,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Password */}
               <div className="space-y-2">
                 <Label htmlFor="login-password">Password</Label>
                 <div className="relative">
@@ -111,7 +117,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Error */}
               {error && (
                 <motion.p
                   initial={{ opacity: 0, y: -6 }}
@@ -122,7 +127,6 @@ export default function LoginPage() {
                 </motion.p>
               )}
 
-              {/* Submit */}
               <Button
                 type="submit"
                 disabled={loading}
@@ -134,7 +138,6 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            {/* Link a registro */}
             <p className="mt-6 text-center text-sm text-muted-foreground">
               No tienes cuenta?{" "}
               <Link
@@ -148,5 +151,13 @@ export default function LoginPage() {
         </Card>
       </motion.div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[calc(100vh-4rem)] flex items-center justify-center"><p className="text-muted-foreground">Cargando...</p></div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
