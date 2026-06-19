@@ -51,7 +51,7 @@ STRICT RULES:
    No markdown, no code blocks wrapping the JSON, just raw JSON.
 9. CRITICAL: Escape all double quotes inside strings with backslash. Escape all backslashes with double backslash. Do NOT use literal newlines inside JSON strings — use \\n instead.
 """
-client = Groq()
+client = Groq(timeout=20.0)
 
 # Estructura minima de una respuesta valida de la IA para feedback.
 EMPTY_CARD = {
