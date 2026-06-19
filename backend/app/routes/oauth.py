@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, url_for, current_app, request
 from flask_jwt_extended import create_access_token, set_access_cookies
 from authlib.integrations.flask_client import OAuth
+from sqlalchemy.exc import IntegrityError
 from ..models.user import User
 from ..models.oauth_account import OAuthAccount
 from .. import db
@@ -16,23 +17,47 @@ def _get_or_create_user(provider, provider_user_id, email, name):
     ).first()
 
     if existing:
-        return User.query.get(existing.user_id)
+        user = User.query.get(existing.user_id)
+        if user is None:
+            db.session.delete(existing)
+            db.session.commit()
+        else:
+            return user
 
     user_by_email = User.query.filter_by(email=email).first()
 
     if user_by_email:
-        link = OAuthAccount(
-            user_id=user_by_email.user_id,
-            provider=provider,
-            provider_user_id=provider_user_id,
-        )
-        db.session.add(link)
-        db.session.commit()
+        existing_link = OAuthAccount.query.filter_by(
+            user_id=user_by_email.user_id, provider=provider
+        ).first()
+        if not existing_link:
+            link = OAuthAccount(
+                user_id=user_by_email.user_id,
+                provider=provider,
+                provider_user_id=provider_user_id,
+            )
+            db.session.add(link)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                linked = OAuthAccount.query.filter_by(
+                    provider=provider, provider_user_id=provider_user_id
+                ).first()
+                if linked:
+                    return User.query.get(linked.user_id)
         return user_by_email
 
     new_user = User(name=name, email=email)
     db.session.add(new_user)
-    db.session.flush()
+    try:
+        db.session.flush()
+    except IntegrityError:
+        db.session.rollback()
+        user_by_email = User.query.filter_by(email=email).first()
+        if user_by_email:
+            return _get_or_create_user(provider, provider_user_id, email, name)
+        raise
 
     link = OAuthAccount(
         user_id=new_user.user_id,
@@ -40,7 +65,21 @@ def _get_or_create_user(provider, provider_user_id, email, name):
         provider_user_id=provider_user_id,
     )
     db.session.add(link)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        User.query.filter_by(user_id=new_user.user_id).delete()
+        db.session.commit()
+        linked = OAuthAccount.query.filter_by(
+            provider=provider, provider_user_id=provider_user_id
+        ).first()
+        if linked:
+            user = User.query.get(linked.user_id)
+            if user:
+                return user
+        return _get_or_create_user(provider, provider_user_id, email, name)
+
     return new_user
 
 
@@ -50,15 +89,21 @@ def _build_login_response(user):
         identity=str(user.user_id), expires_delta=expires_delta
     )
     frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
-    response = redirect(f"{frontend_url}/auth/callback")
+    import urllib.parse
+    encoded_token = urllib.parse.quote(access_token, safe="")
+    response = redirect(f"{frontend_url}/auth/callback?token={encoded_token}")
     set_access_cookies(response, access_token)
     return response
 
 
 @oauth_bp.route("/google")
 def google_login():
-    redirect_uri = url_for("oauth.google_callback", _external=True)
-    return oauth.google.authorize_redirect(redirect_uri)
+    try:
+        redirect_uri = url_for("oauth.google_callback", _external=True)
+        return oauth.google.authorize_redirect(redirect_uri)
+    except Exception:
+        frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
+        return redirect(f"{frontend_url}/login?error=oauth_failed")
 
 
 @oauth_bp.route("/google/callback")
@@ -99,8 +144,12 @@ def google_callback():
 
 @oauth_bp.route("/github")
 def github_login():
-    redirect_uri = url_for("oauth.github_callback", _external=True)
-    return oauth.github.authorize_redirect(redirect_uri)
+    try:
+        redirect_uri = url_for("oauth.github_callback", _external=True)
+        return oauth.github.authorize_redirect(redirect_uri)
+    except Exception:
+        frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
+        return redirect(f"{frontend_url}/login?error=oauth_failed")
 
 
 @oauth_bp.route("/github/callback")

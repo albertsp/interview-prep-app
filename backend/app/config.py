@@ -24,8 +24,10 @@ class Config:
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # JWT en cookies httpOnly para proteccion contra XSS
-    JWT_TOKEN_LOCATION = ["cookies"]
+    # JWT en cookies httpOnly y headers Authorization (para OAuth cross-origin)
+    JWT_TOKEN_LOCATION = ["cookies", "headers"]
+    JWT_HEADER_NAME = "Authorization"
+    JWT_HEADER_TYPE = "Bearer"
     JWT_COOKIE_SECURE = os.getenv("FLASK_ENV") == "production"
     JWT_COOKIE_CSRF_PROTECT = False
     JWT_ACCESS_COOKIE_PATH = "/"

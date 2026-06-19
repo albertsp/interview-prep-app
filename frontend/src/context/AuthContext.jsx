@@ -23,7 +23,7 @@ const DEFAULT_STATS = {
 
 export function AuthProvider({children}){
 
-    const [user, setUser] = useState("")
+    const [user, setUser] = useState(null)
     const [stats, setStats] = useState(DEFAULT_STATS)
     const [initialized, setInitialized] = useState(false)
     const refreshingRef = useRef(false)
@@ -31,7 +31,8 @@ export function AuthProvider({children}){
     useEffect(() => {
         setOnUnauthorized(() => {
             localStorage.removeItem("user")
-            setUser("")
+            localStorage.removeItem("access_token")
+            setUser(null)
             setStats(DEFAULT_STATS)
         })
     }, [])
@@ -69,15 +70,18 @@ export function AuthProvider({children}){
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    function login(logUser){
-        localStorage.setItem("user", logUser)
-        setUser(logUser)
+    function login(logUser, token){
+        const name = logUser || "User"
+        if (token) localStorage.setItem("access_token", token)
+        localStorage.setItem("user", name)
+        setUser(name)
         refreshStats()
     }
 
-    async function loginFromOAuth(){
+    async function loginFromOAuth(token){
+        if (token) localStorage.setItem("access_token", token)
         const profile = await getMyProfile()
-        const name = profile.name
+        const name = profile.name || profile.email || "User"
         localStorage.setItem("user", name)
         setUser(name)
         await refreshStats()
@@ -94,7 +98,8 @@ export function AuthProvider({children}){
         } catch {
         }
         localStorage.removeItem("user")
-        setUser("")
+        localStorage.removeItem("access_token")
+        setUser(null)
         setStats(DEFAULT_STATS)
     }
 

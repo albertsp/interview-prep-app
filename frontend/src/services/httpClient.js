@@ -1,7 +1,14 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export function headers() {
-  return { "Content-Type": "application/json" };
+  const h = { "Content-Type": "application/json" };
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      h["Authorization"] = `Bearer ${token}`;
+    }
+  }
+  return h;
 }
 
 let onUnauthorizedCallback = null;
