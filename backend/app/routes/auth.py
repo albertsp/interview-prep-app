@@ -60,6 +60,9 @@ def login():
     if user is None:
         return jsonify({"error": "Credenciales incorrectas"}), 400
 
+    if user.password is None:
+        return jsonify({"error": "Credenciales incorrectas"}), 400
+
     encodedPassword = password.encode('utf-8')
 
     if bcrypt.checkpw(encodedPassword, user.password.encode('utf-8')) is False:

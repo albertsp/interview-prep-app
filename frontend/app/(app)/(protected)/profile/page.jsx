@@ -46,7 +46,7 @@ export default function ProfilePage() {
     const xpToNextLevel = stats.xp_to_next_level || 0;
 
     return (
-        <div className="flex min-h-[80vh] bg-slate-50 items-center justify-center p-4">
+        <div className="flex min-h-[80vh] bg-background items-center justify-center p-4">
             <ChangeUserName isOpenChangeUserName={isOpenChangeUserName} setIsOpenChangeUserName={setIsOpenChangeUserName} />
             <motion.div
                 className="w-full max-w-md"
@@ -58,7 +58,7 @@ export default function ProfilePage() {
                     <motion.div variants={itemVariants} className="flex justify-center pt-10 pb-6">
                         <div className="relative">
                             <Avatar className="h-52 w-52 border-4 border-background shadow-xl">
-                                <AvatarFallback className="text-4xl font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200">
+                                <AvatarFallback className="text-4xl font-bold bg-muted text-foreground">
                                     {user?.split(' ').map(n => n[0]).join('') || "U"}
                                 </AvatarFallback>
                             </Avatar>

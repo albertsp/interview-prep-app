@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import CodeEditor from "@/components/CodeEditor";
+import dynamic from "next/dynamic";
+const CodeEditor = dynamic(() => import("@/components/CodeEditor"), { ssr: false });
 import MarkdownContent from "@/components/MarkdownContent";
 import {
   Eye,
@@ -91,7 +92,7 @@ export function CardView({ card, wasEdited }) {
             {card.concept || "Sin titulo"}
           </h3>
           {wasEdited && (
-            <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 mt-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 mt-1.5">
               Editado por ti
             </span>
           )}

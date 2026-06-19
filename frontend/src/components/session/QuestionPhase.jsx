@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import MarkdownContent from "@/components/MarkdownContent";
-import CodeEditor from "@/components/CodeEditor";
+import dynamic from "next/dynamic";
+const CodeEditor = dynamic(() => import("@/components/CodeEditor"), { ssr: false });
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";

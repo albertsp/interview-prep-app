@@ -63,28 +63,31 @@ export default function DashboardPage() {
   }, [cards, debouncedSearch, languageFilter, orderSort])
 
   const handleDeleteCard = async (card_id) => {
+    const previousCards = cards
+    setCards(cards.filter(c => c.card_id !== card_id))
+    setIsSingleCardOpen(false)
+    setSelectedCard(null)
+    setOriginalCard(null)
     try {
       await deleteCardById(card_id)
-      setIsSingleCardOpen(false)
-      setSelectedCard(null)
-      setOriginalCard(null)
-      const data = await getCards()
-      setCards(data)
     } catch (err) {
+      setCards(previousCards)
       setError(err.message)
     }
   }
 
   const handleSaveCard = async () => {
     if (!selectedCard) return
+    const previousCards = cards
+    const updatedCards = cards.map(c => c.card_id === selectedCard.card_id ? { ...selectedCard } : c)
+    setCards(updatedCards)
+    setIsSingleCardOpen(false)
+    setSelectedCard(null)
+    setOriginalCard(null)
     try {
       await updateCard(selectedCard.card_id, selectedCard)
-      setIsSingleCardOpen(false)
-      setSelectedCard(null)
-      setOriginalCard(null)
-      const data = await getCards()
-      setCards(data)
     } catch (err) {
+      setCards(previousCards)
       setError(err.message)
     }
   }
@@ -151,54 +154,54 @@ export default function DashboardPage() {
             {filtered_cards.map((card) => (
               <div
                 key={card.card_id}
-                className="flex flex-col justify-between bg-white rounded-xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-3">
-                    <h2 className="text-xl font-semibold text-slate-900 capitalize">
-                      {card.concept}
-                    </h2>
-                    {card.code_language && (
-                      <span className="px-2.5 py-0.5 text-xs font-medium bg-blue-50 text-blue-600 rounded-full uppercase tracking-wider">
-                        {card.code_language}
-                      </span>
-                    )}
-                  </div>
+className="flex flex-col justify-between bg-card rounded-xl border border-border p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+               >
+                 <div>
+                   <div className="flex items-start justify-between gap-2 mb-3">
+                     <h2 className="text-xl font-semibold text-foreground capitalize">
+                       {card.concept}
+                     </h2>
+                     {card.code_language && (
+                       <span className="px-2.5 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded-full uppercase tracking-wider">
+                         {card.code_language}
+                       </span>
+                     )}
+                   </div>
 
-                  <p className="text-sm text-slate-600 mb-4 leading-relaxed">
-                    {card.explanation}
-                  </p>
+                   <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                     {card.explanation}
+                   </p>
 
-                  {card.use_case && (
-                    <div className="mb-4">
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">
-                        Caso de Uso:
-                      </span>
-                      <p className="text-xs bg-slate-50 p-2.5 rounded border border-slate-200 text-slate-700 italic">
-                        &ldquo;{card.use_case}&rdquo;
-                      </p>
-                    </div>
-                  )}
+                   {card.use_case && (
+                     <div className="mb-4">
+                       <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
+                         Caso de Uso:
+                       </span>
+                       <p className="text-xs bg-muted p-2.5 rounded border border-border text-foreground italic">
+                         &ldquo;{card.use_case}&rdquo;
+                       </p>
+                     </div>
+                   )}
 
-                  {card.code && (
-                    <div className="mb-4">
-                      <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">
-                        Ejemplo de Codigo:
-                      </span>
-                      <pre className="p-3 bg-slate-900 rounded-lg overflow-x-auto text-xs text-emerald-400 font-mono" aria-label={`Codigo de ejemplo: ${card.code_language || 'code'}`}>
-                        <code>{card.code}</code>
-                      </pre>
-                    </div>
-                  )}
-                </div>
+                   {card.code && (
+                     <div className="mb-4">
+                       <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
+                         Ejemplo de Codigo:
+                       </span>
+                       <pre className="p-3 bg-foreground rounded-lg overflow-x-auto text-xs text-emerald-400 font-mono" aria-label={`Codigo de ejemplo: ${card.code_language || 'code'}`}>
+                         <code>{card.code}</code>
+                       </pre>
+                     </div>
+                   )}
+                 </div>
 
-                <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
-                  <Button
-                    variant="outline"
-                    className="text-xs font-medium px-3 py-1.5 h-auto bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 border border-green-200 shadow-none flex items-center gap-1.5"
-                    onClick={() => {abrirCard(card)}}
-                    aria-label={`Abrir card: ${card.concept}`}
-                  >
+                 <div className="mt-4 pt-4 border-t border-border flex justify-between items-center">
+                   <Button
+                     variant="outline"
+                     className="text-xs font-medium px-3 py-1.5 h-auto shadow-none flex items-center gap-1.5"
+                     onClick={() => {abrirCard(card)}}
+                     aria-label={`Abrir card: ${card.concept}`}
+                   >
                     Abrir
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Button>

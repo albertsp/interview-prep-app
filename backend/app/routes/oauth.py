@@ -69,22 +69,32 @@ def google_callback():
         frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
         return redirect(f"{frontend_url}/login?error=oauth_failed")
 
-    userinfo = token.get("userinfo")
-    if not userinfo:
-        userinfo = oauth.google.userinfo()
+    try:
+        userinfo = token.get("userinfo")
+        if not userinfo:
+            try:
+                userinfo = oauth.google.userinfo()
+            except Exception:
+                frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
+                return redirect(f"{frontend_url}/login?error=oauth_failed")
 
-    google_id = str(userinfo["sub"])
-    email = userinfo.get("email", "")
-    name = userinfo.get("name", email.split("@")[0])
+        google_id = str(userinfo["sub"])
+        email = userinfo.get("email", "")
+        if not email:
+            email = f"google_{google_id}@users.noreply.google.com"
+        name = userinfo.get("name", email.split("@")[0]) or f"Google User {google_id}"
 
-    user = _get_or_create_user(
-        provider="google",
-        provider_user_id=google_id,
-        email=email,
-        name=name,
-    )
+        user = _get_or_create_user(
+            provider="google",
+            provider_user_id=google_id,
+            email=email,
+            name=name,
+        )
 
-    return _build_login_response(user)
+        return _build_login_response(user)
+    except Exception:
+        frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
+        return redirect(f"{frontend_url}/login?error=oauth_failed")
 
 
 @oauth_bp.route("/github")
@@ -101,27 +111,33 @@ def github_callback():
         frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
         return redirect(f"{frontend_url}/login?error=oauth_failed")
 
-    resp = oauth.github.get("user", token=token)
-    profile = resp.json()
+    try:
+        resp = oauth.github.get("user", token=token)
+        profile = resp.json()
 
-    github_id = str(profile["id"])
-    name = profile.get("name") or profile.get("login", "")
-    primary_email = None
+        github_id = str(profile["id"])
+        name = profile.get("name") or profile.get("login", "") or f"GitHub User {github_id}"
+        primary_email = None
 
-    emails_resp = oauth.github.get("user/emails", token=token)
-    if emails_resp.ok:
-        for e in emails_resp.json():
-            if e.get("primary"):
-                primary_email = e.get("email")
-                break
+        emails_resp = oauth.github.get("user/emails", token=token)
+        if emails_resp.ok:
+            for e in emails_resp.json():
+                if e.get("primary"):
+                    primary_email = e.get("email")
+                    break
 
-    email = primary_email or profile.get("email", "")
+        email = primary_email or profile.get("email", "")
+        if not email:
+            email = f"github_{github_id}@users.noreply.github.com"
 
-    user = _get_or_create_user(
-        provider="github",
-        provider_user_id=github_id,
-        email=email,
-        name=name,
-    )
+        user = _get_or_create_user(
+            provider="github",
+            provider_user_id=github_id,
+            email=email,
+            name=name,
+        )
 
-    return _build_login_response(user)
+        return _build_login_response(user)
+    except Exception:
+        frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
+        return redirect(f"{frontend_url}/login?error=oauth_failed")

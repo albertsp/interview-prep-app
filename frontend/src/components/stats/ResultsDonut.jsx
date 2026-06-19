@@ -11,12 +11,12 @@ const RESULT_ITEMS = [
 ];
 
 const CUSTOM_TOOLTIP_STYLE = {
-  backgroundColor: "hsl(var(--card))",
-  border: "1px solid hsl(var(--border))",
+  backgroundColor: "var(--card)",
+  border: "1px solid var(--border)",
   borderRadius: "0.75rem",
   padding: "0.5rem 0.75rem",
   fontSize: "0.8125rem",
-  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.3)",
 };
 
 function CustomTooltip({ active, payload }) {

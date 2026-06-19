@@ -1,6 +1,7 @@
 app = "interview-prep-api"
 
 [build]
+  builder = "docker"
 
 [env]
   FLASK_APP = "app:create_app()"
