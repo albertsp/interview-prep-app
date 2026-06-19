@@ -34,7 +34,6 @@ def create_app():
     from .routes.sessions import sessions
     from .routes.cards import cards
     from .routes.user import user
-    from .routes.debug import debug
 
     Migrate(app, db)                    # Habilita migraciones de base de datos con Flask
 
@@ -98,6 +97,9 @@ def create_app():
     app.register_blueprint(sessions)
     app.register_blueprint(cards)
     app.register_blueprint(user)
-    app.register_blueprint(debug)
+
+    if Config.FLASK_ENV != "production":
+        from .routes.debug import debug
+        app.register_blueprint(debug)
 
     return app
