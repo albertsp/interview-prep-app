@@ -71,7 +71,11 @@ def login():
     expires_delta = current_app.config["JWT_ACCESS_TOKEN_EXPIRES"]
     access_token = create_access_token(identity=str(user.user_id), expires_delta=expires_delta)
 
-    response = jsonify({"user_id": user.user_id, "name": user.name})
+    response = jsonify({
+        "user_id": user.user_id,
+        "name": user.name,
+        "token": access_token,
+    })
     set_access_cookies(response, access_token)
     return response, 200
 

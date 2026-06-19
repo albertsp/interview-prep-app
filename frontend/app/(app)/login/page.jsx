@@ -53,6 +53,7 @@ function LoginForm() {
 
     try {
       const result = await loginUser(email, password);
+      localStorage.setItem("access_token", result.token);
       login(result.name);
       router.push("/session");
     } catch (err) {

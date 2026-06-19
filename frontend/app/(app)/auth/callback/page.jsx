@@ -11,13 +11,19 @@ function OAuthCallbackHandler() {
 
   useEffect(() => {
     const error = searchParams.get("error");
+    const token = searchParams.get("token");
 
     if (error) {
       router.replace("/login?error=oauth_failed");
       return;
     }
 
-    loginFromOAuth()
+    if (!token) {
+      router.replace("/login?error=oauth_failed");
+      return;
+    }
+
+    loginFromOAuth(token)
       .then(() => {
         router.replace("/session");
       })
