@@ -8,15 +8,29 @@ from ..constants.gamification import (
 from ..models.session import Session
 from ..models.question import Question
 from ..models.user import User
-from .. import db
+from .. import db, limiter
 from ..services.ai_service import generate_questions, generate_feedback
 
 sessions = Blueprint('sessions', __name__, url_prefix='/sessions')
+
+# Groq free tier (ver AUDIT.md F0-2): 30 RPM / 1.000 RPD / 100K TPD,
+# compartido entre TODOS los usuarios de la app. "groq_global" agrupa
+# ambos endpoints de IA bajo un unico presupuesto para no agotarlo.
+GROQ_GLOBAL_LIMIT = "20 per minute;40 per day"
+GROQ_GLOBAL_SCOPE = "groq_global"
+
+
+def _groq_global_key():
+    return "global"
 
 
 @sessions.route('/', methods=['POST'])
 # Protegemos el endpoint con JWT
 @jwt_required()
+# Limite por usuario: evita que una sola cuenta agote el presupuesto compartido
+@limiter.limit("5 per hour")
+# Limite global: protege el presupuesto real de la cuenta de Groq (free tier)
+@limiter.shared_limit(GROQ_GLOBAL_LIMIT, scope=GROQ_GLOBAL_SCOPE, key_func=_groq_global_key)
 def create_session():
 
     # Extraemos user_id del token
@@ -66,6 +80,8 @@ def create_session():
 @sessions.route('/<int:session_id>/questions/<int:question_id>', methods=['PATCH'])
 # Protegemos el endpoint con JWT
 @jwt_required()
+@limiter.limit("15 per hour")
+@limiter.shared_limit(GROQ_GLOBAL_LIMIT, scope=GROQ_GLOBAL_SCOPE, key_func=_groq_global_key)
 def answer_question(session_id, question_id):
     # Extraemos user_id del token
     user_id = get_jwt_identity()
