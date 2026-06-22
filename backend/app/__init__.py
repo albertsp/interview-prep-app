@@ -6,11 +6,12 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from authlib.integrations.flask_client import OAuth
 from werkzeug.middleware.proxy_fix import ProxyFix
-
+from flask_mail import Mail
 
 # Creamos la clase SQLAlchemy y JWTManager para integrar con Flask
 db = SQLAlchemy()
 jwt = JWTManager()
+mail = Mail()
 
 # Funcion para crear la app
 def create_app():
@@ -22,12 +23,14 @@ def create_app():
 
     db.init_app(app)                    # Inicializamos app Flask con la extension SQLAlchemy
     jwt.init_app(app)                   # Inicializamos app Flask con extension JTManager
+    mail.init_app(app)                  # Inicializamos app Flask con extension Flas_Mail    
 
     from .models.user import User
     from .models.session import Session
     from .models.question import Question
     from .models.card import Card
     from .models.oauth_account import OAuthAccount
+    from .models.passwordReset import PasswordResetToken
     from .routes.auth import auth
     from .routes.oauth import oauth_bp, oauth
     from .routes.stacks import stacks
@@ -35,6 +38,7 @@ def create_app():
     from .routes.cards import cards
     from .routes.user import user
     from .routes.debug import debug
+    from .routes.passwordReset import password_reset
 
     Migrate(app, db)                    # Habilita migraciones de base de datos con Flask
 
@@ -82,6 +86,15 @@ def create_app():
             "Define la variable en tu .env o en los secrets de Fly.io."
         )
 
+    app.register_blueprint(auth)
+    app.register_blueprint(oauth_bp)
+    app.register_blueprint(stacks)
+    app.register_blueprint(sessions)
+    app.register_blueprint(cards)
+    app.register_blueprint(user)
+    app.register_blueprint(debug)
+    app.register_blueprint(password_reset)
+
     CORS(
         app,
         resources={r"/*": {"origins": allowed_origins}},
@@ -90,14 +103,5 @@ def create_app():
         supports_credentials=True,
         max_age=3600,
     )
-
-
-    app.register_blueprint(auth)
-    app.register_blueprint(oauth_bp)
-    app.register_blueprint(stacks)
-    app.register_blueprint(sessions)
-    app.register_blueprint(cards)
-    app.register_blueprint(user)
-    app.register_blueprint(debug)
 
     return app

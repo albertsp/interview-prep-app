@@ -147,6 +147,16 @@ function LoginForm() {
                 Registrate
               </Link>
             </p>
+
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+              Olvidaste tu contraseña?{" "}
+              <Link
+                href="/reset-password"
+                className="font-medium text-primary underline-offset-2 hover:underline"
+              >
+                Haz click Aqui
+              </Link>
+            </p>
           </CardContent>
         </Card>
       </motion.div>
