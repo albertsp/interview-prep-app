@@ -110,7 +110,8 @@ def google_login():
 def google_callback():
     try:
         token = oauth.google.authorize_access_token()
-    except Exception:
+    except Exception as e:
+        current_app.logger.warning("google authorize_access_token failed: %s", e)
         frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
         return redirect(f"{frontend_url}/login?error=oauth_failed")
 
@@ -118,8 +119,12 @@ def google_callback():
         userinfo = token.get("userinfo")
         if not userinfo:
             try:
-                userinfo = oauth.google.userinfo()
-            except Exception:
+                # Pasar el token explicitamente: en algunas versiones de Authlib el
+                # token almacenado tras authorize_access_token no se adjunta solo
+                # en la llamada a userinfo(), y el endpoint responde 401.
+                userinfo = oauth.google.userinfo(token=token)
+            except Exception as e:
+                current_app.logger.warning("google userinfo fallback failed: %s", e)
                 frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
                 return redirect(f"{frontend_url}/login?error=oauth_failed")
 
@@ -137,7 +142,8 @@ def google_callback():
         )
 
         return _build_login_response(user)
-    except Exception:
+    except Exception as e:
+        current_app.logger.exception("google callback unhandled error: %s", e)
         frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
         return redirect(f"{frontend_url}/login?error=oauth_failed")
 
@@ -147,7 +153,8 @@ def github_login():
     try:
         redirect_uri = url_for("oauth.github_callback", _external=True)
         return oauth.github.authorize_redirect(redirect_uri)
-    except Exception:
+    except Exception as e:
+        current_app.logger.warning("github authorize_redirect failed: %s", e)
         frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
         return redirect(f"{frontend_url}/login?error=oauth_failed")
 
@@ -156,7 +163,8 @@ def github_login():
 def github_callback():
     try:
         token = oauth.github.authorize_access_token()
-    except Exception:
+    except Exception as e:
+        current_app.logger.warning("github authorize_access_token failed: %s", e)
         frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
         return redirect(f"{frontend_url}/login?error=oauth_failed")
 
@@ -187,6 +195,7 @@ def github_callback():
         )
 
         return _build_login_response(user)
-    except Exception:
+    except Exception as e:
+        current_app.logger.exception("github callback unhandled error: %s", e)
         frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
         return redirect(f"{frontend_url}/login?error=oauth_failed")
