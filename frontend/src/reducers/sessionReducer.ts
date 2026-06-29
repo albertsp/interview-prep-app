@@ -1,7 +1,7 @@
 
 
 type Phase = "answering" | "loading_feedback" | "waiting_action" | "complete";
-type Result = "CORRECT" | "PARTIALLY_CORRECT" | "INCORRECT";
+export type Result = "CORRECT" | "PARTIALLY_CORRECT" | "INCORRECT";
 type Action = 
 | { type: "INIT_SESSION"; payload: { session_id: number; stack: string; level: string; questions: Question[] } } 
 | { type: "ANSWER_CHANGED"; payload: string }
@@ -19,14 +19,14 @@ type Action =
 
 
 
-interface Question {
+export interface Question {
   question_id: number;
   question: string;
   answer: string;
   feedback: null | string;
   result?: Result;
 }
-interface Card {
+export interface Card {
   concept: string;
   definition: string;
   explanation: string;
