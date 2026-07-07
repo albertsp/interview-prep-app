@@ -30,22 +30,9 @@ def _get_or_create_user(provider, provider_user_id, email, name):
         existing_link = OAuthAccount.query.filter_by(
             user_id=user_by_email.user_id, provider=provider
         ).first()
+
         if not existing_link:
-            link = OAuthAccount(
-                user_id=user_by_email.user_id,
-                provider=provider,
-                provider_user_id=provider_user_id,
-            )
-            db.session.add(link)
-            try:
-                db.session.commit()
-            except IntegrityError:
-                db.session.rollback()
-                linked = OAuthAccount.query.filter_by(
-                    provider=provider, provider_user_id=provider_user_id
-                ).first()
-                if linked:
-                    return User.query.get(linked.user_id)
+            return None;
         return user_by_email
 
     new_user = User(name=name, email=email)
@@ -89,9 +76,7 @@ def _build_login_response(user):
         identity=str(user.user_id), expires_delta=expires_delta
     )
     frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
-    import urllib.parse
-    encoded_token = urllib.parse.quote(access_token, safe="")
-    response = redirect(f"{frontend_url}/auth/callback?token={encoded_token}")
+    response = redirect(f"{frontend_url}/auth/callback")
     set_access_cookies(response, access_token)
     return response
 
@@ -141,7 +126,12 @@ def google_callback():
             name=name,
         )
 
+        if user is None:
+            frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
+            return redirect(f"{frontend_url}/login?error=email_exists")
+        
         return _build_login_response(user)
+    
     except Exception as e:
         current_app.logger.exception("google callback unhandled error: %s", e)
         frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
@@ -194,7 +184,12 @@ def github_callback():
             name=name,
         )
 
+        if user is None:
+            frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
+            return redirect(f"{frontend_url}/login?error=email_exists")
+
         return _build_login_response(user)
+    
     except Exception as e:
         current_app.logger.exception("github callback unhandled error: %s", e)
         frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:3000")
