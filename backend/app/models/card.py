@@ -53,5 +53,7 @@ class Card(db.Model):
             "mnemonic": self.mnemonic,
             "code": self.code,
             "code_language": self.code_language,
+            "tags": self.tags or [],
+            "difficulty": self.difficulty,
             "created_at": self.created_at.isoformat()
         }
