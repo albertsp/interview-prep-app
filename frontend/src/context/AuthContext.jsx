@@ -90,13 +90,9 @@ export function AuthProvider({children}){
         refreshStats()
     }
 
-    async function loginFromOAuth(token){
-        if (!token) throw new Error("Missing OAuth token")
+    async function loginFromOAuth(){
         loggingInRef.current = true
         try {
-            // Escribimos el token antes de cualquier llamada para que los
-            // headers() lean el valor actualizado desde localStorage.
-            localStorage.setItem("access_token", token)
             const profile = await getMyProfile()
             const name = profile.name || profile.email || "User"
             localStorage.setItem("user", name)
