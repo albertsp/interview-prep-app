@@ -37,7 +37,7 @@ def create_session():
     user_id = get_jwt_identity()
 
     # Obtenemos el body y accedemos a los campos
-    data = request.get_json()
+    data = request.get_json() or {}
     stack = data.get("stack")
     level = data.get("level")
 
@@ -85,29 +85,18 @@ def create_session():
 def answer_question(session_id, question_id):
     # Extraemos user_id del token
     user_id = get_jwt_identity()
-
-    # Guardamos el body de la peticion
-    data = request.get_json()
-
-    # Buscamos en BD la sesión del usuario
+    data = request.get_json() or {}
     user_sesion = Session.query.filter_by(session_id=session_id, user_id=user_id).first()
-
-    # Si no existe devolvemos error
+    
     if user_sesion is None:
         return jsonify({"msg": "La sesión no existe"}), 404
 
-    # Buscamos la pregunta por id
     user_question = Question.query.filter_by(question_id=question_id, session_id=session_id).first()
 
-    # Si no existe devolvemos error
     if user_question is None:
         return jsonify({"msg": "La pregunta no existe"}), 404
 
-    # Guardamos la respuesta del usuario en la BD
     user_question.answer = data.get("answer")
-    db.session.commit()
-
-    # Generamos el feedback de la respuesta y guardamos en BD
     result = generate_feedback(user_sesion.stack, user_question.question, data.get("answer"))
     user_question.feedback = result["feedback"]
     user_question.result = result["result"]
