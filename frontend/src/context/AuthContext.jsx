@@ -66,19 +66,34 @@ export function AuthProvider({children}){
     }, [])
 
     useEffect(() => {
-        // Solo restauramos sesion si AMBAS claves existen: un "user" sin
-        // access_token es estado residual de un login interrumpido y
-        // dispararia un 401 que limpia el token que loginFromOAuth
-        // todavia no ha terminado de escribir.
         const savedUser = localStorage.getItem("user")
         const savedToken = localStorage.getItem("access_token")
-        if (savedUser && savedToken) {
-            setUser(savedUser)
-            refreshStats()
-        } else if (savedUser && !savedToken) {
-            localStorage.removeItem("user")
+
+        const restore = async () => {
+            if (savedUser && savedToken) {
+                setUser(savedUser)
+                refreshStats()
+                setInitialized(true)
+            } else if (savedUser && !savedToken) {
+                loggingInRef.current = true
+                try {
+                    const profile = await getMyProfile()
+                    const name = profile.name || profile.email || "User"
+                    localStorage.setItem("user", name)
+                    setUser(name)
+                    refreshStats()
+                } catch {
+                    localStorage.removeItem("user")
+                } finally {
+                    loggingInRef.current = false
+                    setInitialized(true)
+                }
+            } else {
+                setInitialized(true)
+            }
         }
-        setInitialized(true)
+
+        restore()
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
